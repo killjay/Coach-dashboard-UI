@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach: Workout Template Builder</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#111714",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "1.25rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col font-display text-white">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-10 flex items-center justify-between bg-background-dark/80 px-4 py-3 backdrop-blur-sm">
+<button class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+<span class="text-base font-medium leading-normal">Back</span>
+</button>
+<h1 class="text-lg font-bold leading-tight tracking-[-0.015em]">New Template</h1>
+<button class="text-base font-bold leading-normal tracking-[0.015em] text-primary">Save</button>
+</div>
+<!-- Main Content -->
+<main class="flex-1 px-4 py-3">
+<div class="flex flex-col gap-6">
+<!-- Template Name TextField -->
+<label class="flex flex-col">
+<p class="pb-2 text-base font-medium leading-normal">Template Name</p>
+<input class="form-input h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border-none bg-[#29382f]/60 p-4 text-base font-normal leading-normal text-white placeholder:text-[#9eb7a8] focus:border-none focus:outline-0 focus:ring-2 focus:ring-primary/50" placeholder="e.g., Lower Body Strength - Day 1" value=""/>
+</label>
+<!-- Description TextField -->
+<label class="flex flex-col">
+<p class="pb-2 text-base font-medium leading-normal">Description</p>
+<textarea class="form-input min-h-28 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border-none bg-[#29382f]/60 p-4 text-base font-normal leading-normal text-white placeholder:text-[#9eb7a8] focus:border-none focus:outline-0 focus:ring-2 focus:ring-primary/50" placeholder="Add a short description or goal for this workout..."></textarea>
+</label>
+<!-- Divider -->
+<hr class="border-t border-[#29382f]/80"/>
+<!-- Exercises Header -->
+<div class="flex items-center justify-between">
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Exercises</h2>
+<div class="flex items-center gap-2">
+<button class="flex h-8 w-8 items-center justify-center rounded-full bg-[#29382f]/60">
+<span class="material-symbols-outlined text-xl text-[#9eb7a8]">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Empty State -->
+<div class="flex flex-col items-center gap-4 rounded-xl bg-[#29382f]/40 p-8 text-center">
+<div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#29382f]">
+<span class="material-symbols-outlined text-4xl text-primary">fitness_center</span>
+</div>
+<div class="flex max-w-[480px] flex-col items-center gap-1">
+<p class="text-lg font-bold leading-tight tracking-[-0.015em] text-white">Start Building Your Template</p>
+<p class="max-w-[480px] text-center text-sm font-normal leading-normal text-[#9eb7a8]">Tap the '+' button below to add your first exercise to this workout template.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="pointer-events-none fixed bottom-0 left-0 right-0 z-20 p-6">
+<div class="flex justify-end">
+<button class="pointer-events-auto flex h-14 w-14 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-4xl font-light text-background-dark">add</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

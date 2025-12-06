@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Water Tracker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#112117",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white" style="font-size: 24px;">arrow_back_ios_new</span>
+</div>
+<h2 class="text-zinc-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Water Intake</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-zinc-900 dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+<span class="material-symbols-outlined" style="font-size: 24px;">history</span>
+</button>
+</div>
+</div>
+<!-- Date Navigator -->
+<div class="flex items-center justify-center gap-4 px-4 py-3">
+<span class="material-symbols-outlined text-zinc-400 dark:text-zinc-600" style="font-size: 20px;">chevron_left</span>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary/20 dark:bg-primary/20 text-primary text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Today</span>
+</button>
+<span class="material-symbols-outlined text-zinc-400 dark:text-zinc-600" style="font-size: 20px;">chevron_right</span>
+</div>
+<!-- Progress Visualization -->
+<div class="flex-grow flex items-center justify-center p-8">
+<div class="relative w-64 h-64 sm:w-72 sm:h-72">
+<svg class="w-full h-full" viewbox="0 0 36 36">
+<path class="text-zinc-200 dark:text-zinc-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="2"></path>
+<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="60, 100" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl sm:text-5xl font-bold text-zinc-900 dark:text-white">1500 ml</span>
+<span class="text-base text-zinc-500 dark:text-zinc-400">of 2500 ml</span>
+</div>
+</div>
+</div>
+<!-- Quick Add Buttons -->
+<div class="flex flex-col gap-3 px-4 py-3">
+<div class="flex w-full gap-3 justify-stretch">
+<button class="flex flex-1 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-5 bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white text-base font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">250 ml</span>
+</button>
+<button class="flex flex-1 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-5 bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white text-base font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">500 ml</span>
+</button>
+</div>
+<div class="flex w-full gap-3 justify-stretch">
+<button class="flex flex-1 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-5 bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white text-base font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">750 ml</span>
+</button>
+<button class="flex flex-1 min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-14 px-5 bg-primary text-zinc-900 text-base font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined mr-1" style="font-size: 20px;">add</span>
+<span class="truncate">Custom</span>
+</button>
+</div>
+</div>
+<!-- Log List -->
+<div class="flex flex-col gap-3 px-4 py-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">water_drop</span>
+</div>
+<div>
+<p class="font-semibold text-zinc-900 dark:text-white">500 ml</p>
+<p class="text-sm text-zinc-500 dark:text-zinc-400">10:45 AM</p>
+</div>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-zinc-500 dark:text-zinc-400">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_horiz</span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">water_drop</span>
+</div>
+<div>
+<p class="font-semibold text-zinc-900 dark:text-white">500 ml</p>
+<p class="text-sm text-zinc-500 dark:text-zinc-400">09:12 AM</p>
+</div>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-zinc-500 dark:text-zinc-400">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_horiz</span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">water_drop</span>
+</div>
+<div>
+<p class="font-semibold text-zinc-900 dark:text-white">500 ml</p>
+<p class="text-sm text-zinc-500 dark:text-zinc-400">08:02 AM</p>
+</div>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-zinc-500 dark:text-zinc-400">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

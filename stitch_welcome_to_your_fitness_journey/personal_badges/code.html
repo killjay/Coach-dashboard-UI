@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Personal Badges</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e278",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<div class="flex-1 pb-24">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background-light/80 p-4 pb-2 dark:bg-background-dark/80 backdrop-blur-sm">
+<button class="flex size-12 shrink-0 items-center justify-center text-zinc-900 dark:text-white">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h2 class="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-zinc-900 dark:text-white">Personal Badges</h2>
+<div class="size-12 shrink-0"></div> <!-- Spacer -->
+</header>
+<!-- Headline Text -->
+<div class="px-4 pt-6 pb-3">
+<h1 class="text-zinc-900 dark:text-white text-[32px] font-bold leading-tight tracking-tight">12 / 50 Badges Collected</h1>
+</div>
+<!-- Segmented Buttons -->
+<div class="sticky top-[72px] z-10 bg-background-light/80 px-4 py-3 dark:bg-background-dark/80 backdrop-blur-sm">
+<div class="flex h-10 flex-1 items-center justify-center rounded-full bg-zinc-200 p-1 dark:bg-zinc-800">
+<label class="flex h-full grow cursor-pointer items-center justify-center overflow-hidden rounded-full px-2 text-zinc-500 has-[:checked]:bg-white has-[:checked]:text-zinc-900 has-[:checked]:shadow-sm dark:text-zinc-400 dark:has-[:checked]:bg-zinc-900 dark:has-[:checked]:text-white">
+<span class="truncate text-sm font-medium leading-normal">Earned</span>
+<input checked="" class="invisible w-0" name="badgeFilter" type="radio" value="Earned"/>
+</label>
+<label class="flex h-full grow cursor-pointer items-center justify-center overflow-hidden rounded-full px-2 text-zinc-500 has-[:checked]:bg-white has-[:checked]:text-zinc-900 has-[:checked]:shadow-sm dark:text-zinc-400 dark:has-[:checked]:bg-zinc-900 dark:has-[:checked]:text-white">
+<span class="truncate text-sm font-medium leading-normal">Locked</span>
+<input class="invisible w-0" name="badgeFilter" type="radio" value="Locked"/>
+</label>
+</div>
+</div>
+<!-- Image Grid -->
+<div class="grid grid-cols-2 gap-4 p-4">
+<!-- Earned Badges -->
+<div class="flex flex-col items-center justify-center rounded-xl bg-cover bg-center aspect-square" data-alt="Vibrant abstract image representing a 7 day streak achievement" style="background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuDDz-ZFwoVSBfGgCFqJmR88N02HB7SZih_b3Jnq1fby1xkWbvcF_tvRv5ZLalLIpIJi9XCpOxeD_M2l-Z5hn45av1bRReIkmIoHjQ9NJfhD7CSN67Aj2Ho_Sd1b6s9TWnkPhMaBtfRryJEomFrDc5h6B1p6F2sdDg_E2za_FcZ6WeM5R_Tn84pj2ex68MXLXZvwEGH3qCjF1g_R8dTXg4uRJRYb1SpJb_JL6ptRa1qBhRiAb6pflAmIqTW-HrcWo69otVLpqVkPNs0');">
+<img alt="7 Day Streak Badge Icon" class="h-16 w-16 mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKiBCJr4OEWAqJhrrEykSx0RjiRHL4y2vZjXE1k_LL7g_3I5dvy42U44hcEXWSze_r4Z3OMKN7RJwdVScyAt6_p3ziN58UnjvTpvJEIOH32piZCjMXKkBgSk12TqTgzt6D-MwnZGjANkHsEKEw6RbbJFqETTib1wGg_WqbaXQ0WxN37FiezynmDlm5Ou_loFflSMOhz3I7WXYS3389KKhy86l8BeECicmaZwa-dBuCWgD2Yf8tnoZ_92gDBHfnq5Y1dKc5Kxkwjs4"/>
+<p class="w-[80%] text-center text-base font-bold leading-tight text-white line-clamp-2">7 Day Streak</p>
+</div>
+<div class="flex flex-col items-center justify-center rounded-xl bg-cover bg-center aspect-square" data-alt="Vibrant abstract image representing a 100k steps achievement" style="background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuCSAIt98k_DIfgCjGLgIZzBsyREHjohv5G665hwL_rniRsYFN_dODp1V3f2UzbfBjFfl_vRt9OD45kadtYVLXRu3IX42zKRVQCFhDS7qRmbZQGO8HIZFvjBEELNd28wqwXCrjP0BW0P0SjIjjZzENXbtEDNxgY5tkqaSEmo8tJbwxbY6dQGl_3FMuDNVtort8mfc1D8NEPHtzMGqcPCDcpky92HdpdkC8-GLNUdvBuDy5jpgJGxLFjmpr6r2zyVJFHEzwWqJSeXtEA');">
+<img alt="100k Steps Club Badge Icon" class="h-16 w-16 mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgIHUqhn6k0-8YIVcQ_FbTDa84Ek0IdB56bNChmsai8560hTWtQxwLrDDn-ZfCYoDfBNKe4Rz1-jMig1nyK_6R23uWt12C2fnWJHvBjVwKzV7i5ZueBUwiB529uEhGEWh9eZ8Vi1hn3F4JvS9wSYyyRKpvwaFvnX5tOafWnwqq8-fKb3IhPBnI_7toNryA4vNSy3lzK3kWjcq-IN-C3boFzFwGKgvSBD5JVBCcwRDFUizfHG1ZaA_-SRBfx2PpZ9-F6lfM3htcGCA"/>
+<p class="w-[80%] text-center text-base font-bold leading-tight text-white line-clamp-2">100k Steps Club</p>
+</div>
+<div class="flex flex-col items-center justify-center rounded-xl bg-cover bg-center aspect-square" data-alt="Vibrant abstract image representing a perfect week achievement" style="background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ4wH41Z9ZgnrdYUzBCf1HDwTXktgNo99TUI2RAj5fRZZStfvMalIDl5yuaxoDVRS23NBciiEp1NWEcmprsmRIR4Z7_vhQItFGRYYBIUvtqGppF0mrcJngDOZViddiOCyDFb4PPIjjIrIKABiTkt6fFELlVnA5Vpj_V9jDFwwQI2nzHGlE2_NtvM9_oSqmdJHMSb7iyMe2yJZry7BHLX7uEZkALSIRnOOTyDgTsFS1P9o_gZVPeC8S6hs4dyLkyHJYAPMx-65hy3A');">
+<img alt="Perfect Week Badge Icon" class="h-16 w-16 mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7p1fMkR99MeW6XNRS-F9umhTYmiqyreEpBviODMTjKdL_U29EtTSCPe66AEQ8YFIP7W1QId9IHgr-wqGdWdjf_9-ofM5KxgBz7kKALD5j9Wj1iOUCRPn5NbWhJOZr841ay-__yNIHIC6ajA_fv9mq1lW73C57nfqLWaoVQCHS1MTPWWxbPlCb91JYBzj1V999GuMvfDPhl_x0qvWaROZeLHG2fDybV2wt7zJXwNx2B3FwxnKILnuNfP0vyFRwvAa22uO7F3_tJYU"/>
+<p class="w-[80%] text-center text-base font-bold leading-tight text-white line-clamp-2">Perfect Week</p>
+</div>
+<div class="flex flex-col items-center justify-center rounded-xl bg-cover bg-center aspect-square" data-alt="Vibrant abstract image representing a first 5k run achievement" style="background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuCMoKbW79JpHVTAGmIiwOr8lmX4cl4YMPH_F7ueUxNfVVqQQkCaJhwl6MtyJiZLkaHZ_JbVb5QppRxadwQc_LNqcaCqdH5txOXQpmJmulHHaK_uyTAJRUVr_R6LlT5yrvwqTFzGbsC8M98GP3wEg-JdD9lOvFr3bjWt--E0livli7lwmbNtaElZX2r4nPLEEvE2-gGNxiis_d3326UAmTg0EvI4pkOPvQ45Haz7GIHTZ1xDl7IRHis3MilDa4GOx1BgwUEPjFYq-2s');">
+<img alt="First 5k Badge Icon" class="h-16 w-16 mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkuXblhhkbdCZQPhHCXvdlxIOwYMra0MYGL6pWdFY1bZbgxPkFN-1hLEBckaqEpnENF-ZCH9QVrKSubDNJbGSKdv2vzWa1hAhRUHqdqdmYJBY9yO9GG4LHU9DK7XP99kvJAlnkD3tyvb44xdxlRCt6aPyKs4XNJjgr23Xk0OUXkpqHI_DxDaImLXRYPhVE8VW0BSaqvRLRtwj-aY7iw_xiOEXxgCohFAjx7fOP3HI7vwajzGtk6VtYkwb1xp5NJmaAtGGpgoe-RNo"/>
+<p class="w-[80%] text-center text-base font-bold leading-tight text-white line-clamp-2">First 5k</p>
+</div>
+<div class="flex flex-col items-center justify-center rounded-xl bg-cover bg-center aspect-square" data-alt="Vibrant abstract image representing an early riser achievement" style="background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuAqxrtHjobqxxUnZwoMyPIrp1YB-MBv_BO9JTSyY4h7gxxHLgZwiIknrZXDhG-W3Q5C-pRA2B1B7P6L3c5E9TfRPBdyrZMq9F4yTVemdn4IlH0Ubuzm5QfetZlfD2GdA48ojgXqgttE14-61iE_w1gGv4FGwHC0Fg_PaY7SWBbCWJxr-3Y6nT2cslE9kG_PpCBqLJuyMS9clzI51tWi0hufV4TPwh8tMuFuAhgrXGEj928-Xexfrdi2K_M9r5qgQXruiRi5EWkfMHQ');">
+<img alt="Early Riser Badge Icon" class="h-16 w-16 mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdABclJ185W-MC_DDJgLUqifWz2Aiks3Uxh7Ef2PpVG7r4NhWRByz9U9OJ8Sz7f6PN-yJF6yP7arFAmBKbUdTLvbtj4UAvhoHKztrxR7bGgLjssnSyyOVlxv4PHzIa6zGo-7a2uZFr0hpE_UZaX3Py2kdJtV4NBvW_D1U7j1uKB3EKvuoKyT2iF1GkJF8uwq4LnYSCuGMWKTvxsq0wFyGKUYFyUIH6GhNIA4BjFs2MCcZvBPUXg88vV5rLqezB_gjoeytXz6YsoKI"/>
+<p class="w-[80%] text-center text-base font-bold leading-tight text-white line-clamp-2">Early Riser</p>
+</div>
+<div class="flex flex-col items-center justify-center rounded-xl bg-cover bg-center aspect-square" data-alt="Vibrant abstract image representing a mountain climber achievement" style="background-image: linear-gradient(0deg, rgba(20, 20, 20, 0.4) 0%, rgba(20, 20, 20, 0.4) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuCzkT6ZFPSM8sLiCB1x-7G6NaWQm6u4w-SEaQu-rZ9kBi8zHpXXFCqhxgNorRMTQsB6lkslc0pm397YTjCFLfk9SIni2J5l9bC-0qaqhg9tsbL4XrzAQuTdSwz9YI75EyzcXkvgr4DN_RovQ-Pk4sL3G7s_tGxBQQhu1PM_XV9rnVRcmGvLYDRi45M085HrKbosvmD4jLRYulg8izWi2AIebi5EVQyLrwvHQnh_harsWB3wXiyJiL56CWIkyRat3R2OvN1Q4ZQ88O0');">
+<img alt="Mountain Climber Badge Icon" class="h-16 w-16 mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmO1H4HRHQGKOAvMdtnlPewAXeCe0q_pbqn2Em1NjL1mUk3S8UKJFPd6nTBj5NpniOqxX2An8MJT-g1R1gGICOm4BMHIHl7XdA9tk_tNojXi5Pq3YVD9GLTqnaCbl2iDyKvZj3xAGTE2yQoQpiI8ByL50alSREbPEMChua2FzHZUMPL--z2xN_ZX_Jb0_svMGchY3iTXJxwCWMZ5FZhE-2TAR4fd_4XG5aRjWKHA2Q9E5P_v2dSxgYdP5dx9j72gUTRyhRTo2dlkY"/>
+<p class="w-[80%] text-center text-base font-bold leading-tight text-white line-clamp-2">Mountain Climber</p>
+</div>
+<!-- Locked Badges (Example) -->
+<div class="relative flex flex-col items-center justify-center rounded-xl bg-zinc-200 dark:bg-zinc-800 aspect-square">
+<img alt="Hydration Hero Badge Icon" class="h-16 w-16 mb-2 opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3tIEYcX4iWonZfQbewkI-gEmiVJuNMuaGq1muZ3nL3QbuSrR3_4SqHeGWRE8EbWAn64qPHQZV48MPzXJLZKdt2hcb-ptwzkrfmcY50DZlz_BUws5EiQBBG8lwHTG_W-6Zs-QiWCfLKoloCug6B61omVNW-VoslmVjFWfzcuwQMv8PUgD5pIsNtmmxNPl5f4XjqBkvIkJt1H1Wm99m9YJXY3bet2L_3bf7aJRA2marcvOzh6Wea14eHHRfDGEbeF4SaSt6PxYbvkk"/>
+<p class="w-[80%] text-center text-base font-bold leading-tight text-zinc-400 dark:text-zinc-500 line-clamp-2">Hydration Hero</p>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-zinc-400 dark:text-zinc-600">lock</span>
+</div>
+</div>
+<div class="relative flex flex-col items-center justify-center rounded-xl bg-zinc-200 dark:bg-zinc-800 aspect-square">
+<img alt="Workout Warrior Badge Icon" class="h-16 w-16 mb-2 opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpKFtrmmLH2tN8sNfylJnqYvXjK8FJGPjQ52my3gC8Ic6E-MSYx0MSnyKzrRrPV8Sd_Y_CInGA3NABEkHFlxxnyO1yJ6_n4ci6eDjNXpfby_neNhVLMb-JepwAqjxxdB5WJgwRe6ByKXqvIzrqSS51wWhQAIhf3kzpEBKzGPr5R3xFnr_6Lw-COOkf-VfiIby1lUyoIZ3kAX9A4nFWM-bS5ygXtk1sm2McP2bhu2_W_7fglqHNouogaaXlcKrZGb1LO0i2bpqridY"/>
+<p class="w-[80%] text-center text-base font-bold leading-tight text-zinc-400 dark:text-zinc-500 line-clamp-2">Workout Warrior</p>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-zinc-400 dark:text-zinc-600">lock</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 border-t border-zinc-200 bg-background-light/80 pt-2 dark:border-zinc-800 dark:bg-background-dark/80 backdrop-blur-sm">
+<div class="flex px-4 pb-3">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-zinc-500 dark:text-zinc-400" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<p class="text-xs font-medium leading-normal">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-zinc-500 dark:text-zinc-400" href="#">
+<span class="material-symbols-outlined text-2xl">fitness_center</span>
+<p class="text-xs font-medium leading-normal">Workouts</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill text-2xl">shield</span>
+<p class="text-xs font-medium leading-normal">Badges</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-zinc-500 dark:text-zinc-400" href="#">
+<span class="material-symbols-outlined text-2xl">group</span>
+<p class="text-xs font-medium leading-normal">Community</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-zinc-500 dark:text-zinc-400" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+<p class="text-xs font-medium leading-normal">Profile</p>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

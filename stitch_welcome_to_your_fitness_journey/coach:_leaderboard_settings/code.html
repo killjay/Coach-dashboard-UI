@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach: Leaderboard Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400,FILL@0&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#112117",
+            },
+            fontFamily: {
+              "display": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-10 flex items-center justify-between p-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">arrow_back_ios_new</span>
+</div>
+<h1 class="flex-1 text-center text-lg font-bold leading-tight tracking-tight text-zinc-900 dark:text-white">Leaderboard Settings</h1>
+<div class="flex w-12 items-center justify-end">
+<button class="text-base font-bold leading-normal text-primary">Save</button>
+</div>
+</div>
+<!-- Body Text -->
+<p class="px-4 pb-4 pt-2 text-base font-normal leading-normal text-zinc-600 dark:text-zinc-400">Choose which leaderboards are visible to your community.</p>
+<div class="flex flex-col gap-2">
+<!-- Section Header: Activity -->
+<div class="px-4 pb-2 pt-4">
+<h2 class="text-lg font-bold leading-tight tracking-tight text-zinc-900 dark:text-white">Activity</h2>
+</div>
+<!-- List Item: Daily Steps -->
+<div class="flex min-h-14 items-center justify-between gap-4 bg-background-light px-4 dark:bg-background-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">footprint</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal text-zinc-900 dark:text-white">Daily Steps</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-zinc-200 p-0.5 has-[:checked]:bg-primary dark:bg-zinc-800">
+<input checked="" class="peer invisible absolute" type="checkbox"/>
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-300 ease-in-out peer-checked:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+</label>
+</div>
+</div>
+<!-- List Item: Weekly Steps -->
+<div class="flex min-h-14 items-center justify-between gap-4 bg-background-light px-4 dark:bg-background-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">footprint</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal text-zinc-900 dark:text-white">Weekly Steps</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-zinc-200 p-0.5 has-[:checked]:bg-primary dark:bg-zinc-800">
+<input checked="" class="peer invisible absolute" type="checkbox"/>
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-300 ease-in-out peer-checked:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+</label>
+</div>
+</div>
+<!-- List Item: Monthly Steps -->
+<div class="flex min-h-14 items-center justify-between gap-4 bg-background-light px-4 dark:bg-background-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">footprint</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal text-zinc-900 dark:text-white">Monthly Steps</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-zinc-200 p-0.5 has-[:checked]:bg-primary dark:bg-zinc-800">
+<input class="peer invisible absolute" type="checkbox"/>
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-300 ease-in-out peer-checked:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+</label>
+</div>
+</div>
+<!-- List Item: Distance Covered -->
+<div class="flex min-h-14 items-center justify-between gap-4 bg-background-light px-4 dark:bg-background-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">straighten</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal text-zinc-900 dark:text-white">Distance Covered</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-zinc-200 p-0.5 has-[:checked]:bg-primary dark:bg-zinc-800">
+<input checked="" class="peer invisible absolute" type="checkbox"/>
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-300 ease-in-out peer-checked:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+</label>
+</div>
+</div>
+<!-- Section Header: Workouts -->
+<div class="px-4 pb-2 pt-4">
+<h2 class="text-lg font-bold leading-tight tracking-tight text-zinc-900 dark:text-white">Workouts</h2>
+</div>
+<!-- List Item: Workout Consistency -->
+<div class="flex min-h-14 items-center justify-between gap-4 bg-background-light px-4 dark:bg-background-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">event_repeat</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal text-zinc-900 dark:text-white">Workout Consistency</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-zinc-200 p-0.5 has-[:checked]:bg-primary dark:bg-zinc-800">
+<input checked="" class="peer invisible absolute" type="checkbox"/>
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-300 ease-in-out peer-checked:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+</label>
+</div>
+</div>
+<!-- List Item: Total Workout Time -->
+<div class="flex min-h-14 items-center justify-between gap-4 bg-background-light px-4 dark:bg-background-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">timer</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal text-zinc-900 dark:text-white">Total Workout Time</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-zinc-200 p-0.5 has-[:checked]:bg-primary dark:bg-zinc-800">
+<input checked="" class="peer invisible absolute" type="checkbox"/>
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-300 ease-in-out peer-checked:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+</label>
+</div>
+</div>
+<!-- List Item: Calories Burned -->
+<div class="flex min-h-14 items-center justify-between gap-4 bg-background-light px-4 dark:bg-background-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">local_fire_department</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal text-zinc-900 dark:text-white">Calories Burned</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-zinc-200 p-0.5 has-[:checked]:bg-primary dark:bg-zinc-800">
+<input class="peer invisible absolute" type="checkbox"/>
+<div class="h-full w-[27px] rounded-full bg-white transition-transform duration-300 ease-in-out peer-checked:translate-x-[20px]" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+</body></html>

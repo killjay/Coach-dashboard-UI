@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach: Assign Plans</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#111714",
+              "surface-dark": "#18231d",
+              "surface-light": "#ffffff",
+              "text-light-primary": "#1c1c1e",
+              "text-dark-primary": "#ffffff",
+              "text-light-secondary": "#8e8e93",
+              "text-dark-secondary": "#9eb7a8",
+              "border-dark": "#3d5245",
+              "border-light": "#e5e5e5"
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.75rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex min-h-screen w-full flex-col text-text-light-primary dark:text-text-dark-primary group/design-root" style="--checkbox-tick-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(17,23,20)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e');">
+<div class="flex flex-col flex-1 pb-28">
+<!-- Top App Bar -->
+<header class="flex items-center p-4">
+<button class="text-text-light-primary dark:text-text-dark-primary flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+</button>
+<h1 class="text-xl font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Assign Plan</h1>
+<div class="size-10"></div> <!-- Spacer for balance -->
+</header>
+<!-- Search Bar -->
+<div class="px-4 py-3">
+<div class="relative flex w-full flex-1 items-stretch rounded-lg h-12">
+<div class="text-text-light-secondary dark:text-text-dark-secondary flex bg-black/5 dark:bg-surface-dark items-center justify-center pl-4 rounded-l-lg">
+<span class="material-symbols-outlined text-2xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-black/5 dark:bg-surface-dark h-full placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary pl-2 text-base font-normal leading-normal" placeholder="Search by client name..." value=""/>
+</div>
+</div>
+<!-- Client Selection Section -->
+<section class="flex flex-col">
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-sm font-bold tracking-wider uppercase px-4 pb-2 pt-4">SELECT CLIENTS</h2>
+<div class="px-4 bg-surface-light dark:bg-surface-dark rounded-xl mx-4 py-2">
+<label class="flex gap-x-4 py-3 flex-row-reverse justify-between items-center border-b border-border-light dark:border-border-dark">
+<input class="h-6 w-6 rounded-md border-border-light dark:border-border-dark border-2 bg-transparent text-primary checked:bg-primary checked:border-primary checked:bg-[image:--checkbox-tick-svg] focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-light dark:focus:ring-offset-surface-dark focus:ring-primary/50 focus:outline-none" type="checkbox"/>
+<div class="flex items-center gap-4 flex-1">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<p class="text-base font-medium leading-normal">Select All</p>
+</div>
+</label>
+<label class="flex gap-x-4 py-3 flex-row-reverse justify-between items-center border-b border-border-light dark:border-border-dark">
+<input checked="" class="h-6 w-6 rounded-md border-border-light dark:border-border-dark border-2 bg-transparent text-primary checked:bg-primary checked:border-primary checked:bg-[image:--checkbox-tick-svg] focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-light dark:focus:ring-offset-surface-dark focus:ring-primary/50 focus:outline-none" type="checkbox"/>
+<div class="flex items-center gap-4 flex-1">
+<img class="size-10 rounded-full object-cover" data-alt="Portrait of a woman with curly hair." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2EyHTIaaLO8W3faGK0YVE7x2SMmXYx5IRpxf83ePKQcF2T_JKmaw3hC-CROB7WySkPMsgs_jomdcSPJteRfzY2vfLY8R8RYWaL5gQJdupVkh6HrwoA2ZbTQggawe71t4s0-wZoQD2Cye6iKPOGqa_OTjteoUwN5E5DceDIhFXx3ypIgPBgNxSkhEIRRy6GJUwW9sO8ZZhrAc1DBLLQgX0-gXVZxl7PoY522_sv-dzNaQuxdypMh4dmOApMX5L0j8J8OYcSsIrPQs"/>
+<p class="text-base font-normal leading-normal">Alex Morgan</p>
+</div>
+</label>
+<label class="flex gap-x-4 py-3 flex-row-reverse justify-between items-center border-b border-border-light dark:border-border-dark">
+<input class="h-6 w-6 rounded-md border-border-light dark:border-border-dark border-2 bg-transparent text-primary checked:bg-primary checked:border-primary checked:bg-[image:--checkbox-tick-svg] focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-light dark:focus:ring-offset-surface-dark focus:ring-primary/50 focus:outline-none" type="checkbox"/>
+<div class="flex items-center gap-4 flex-1">
+<img class="size-10 rounded-full object-cover" data-alt="Portrait of a man with short brown hair." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDI2upoXH6FXD_a7noWkRMT5VNab3Ith2s1xIgloW7l6Ne_CZ524oF6gt4pTWEJePo6FgiY0GqbVWe02jj2tMTTOnLFn2ZbvUqHCWJrdHuYFU_JBm6QZIlcKxHrLBGn3Novnw4i9QzYW8Hb5EKdpDU0sk4KwnKNCYan3m5MV7Yc0MfIOXbUtrNFJYR59D5I4209GrkkFT3mCSfULAhekbqYh-zAHUFxsm7XbKmUd9_jW-_UAhP4TRdlpYSbZupcizwazDmEccTEZOU"/>
+<p class="text-base font-normal leading-normal">James Anderson</p>
+</div>
+</label>
+<label class="flex gap-x-4 py-3 flex-row-reverse justify-between items-center">
+<input checked="" class="h-6 w-6 rounded-md border-border-light dark:border-border-dark border-2 bg-transparent text-primary checked:bg-primary checked:border-primary checked:bg-[image:--checkbox-tick-svg] focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-light dark:focus:ring-offset-surface-dark focus:ring-primary/50 focus:outline-none" type="checkbox"/>
+<div class="flex items-center gap-4 flex-1">
+<img class="size-10 rounded-full object-cover" data-alt="Portrait of a woman with long brown hair." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQkZYwtoL9x4kJ_gJS4ACaLnzT7GUenUcUTi--WfjRc9NgeB8M9OU7JYt_Hp6Mz59RbEKPF7kc1HqGTMJikMbqHpqTazA3GBZaPCEA3urdgiexgNvZq9xwjRO98elZJjzB-Nr4XnOBGMBwVS4G_Lp6rnzydG5egMKqTKT3C9-8htidDZcbLRE2VK4islBnkzOjBKY4Q1odTq43poP8ZSS0KgOCAv3GqeeN2zI1L3t2zGFAlmt29WajZ5Y3Lx-CeGcZzti2ff9UG7k"/>
+<p class="text-base font-normal leading-normal">Serena Williams</p>
+</div>
+</label>
+</div>
+</section>
+<!-- Plan & Date Selection Section -->
+<section class="flex flex-col mt-6">
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-sm font-bold tracking-wider uppercase px-4 pb-2 pt-4">SELECT PLAN &amp; DATE</h2>
+<div class="px-4 bg-surface-light dark:bg-surface-dark rounded-xl mx-4 py-2">
+<button class="flex w-full items-center justify-between py-4 text-left border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 items-center justify-center rounded-full bg-primary/20">
+<span class="material-symbols-outlined text-primary text-2xl">fitness_center</span>
+</div>
+<span class="font-medium">Workout Template</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-text-light-secondary dark:text-text-dark-secondary">Full Body Strength</span>
+<span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary text-2xl">arrow_forward_ios</span>
+</div>
+</button>
+<button class="flex w-full items-center justify-between py-4 text-left border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4">
+<div class="flex size-10 items-center justify-center rounded-full bg-primary/20">
+<span class="material-symbols-outlined text-primary text-2xl">restaurant_menu</span>
+</div>
+<span class="font-medium">Diet Plan</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-text-light-secondary dark:text-text-dark-secondary">Choose a diet plan</span>
+<span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary text-2xl">arrow_forward_ios</span>
+</div>
+</button>
+<button class="flex w-full items-center justify-between py-4 text-left">
+<div class="flex items-center gap-4">
+<div class="flex size-10 items-center justify-center rounded-full bg-primary/20">
+<span class="material-symbols-outlined text-primary text-2xl">calendar_month</span>
+</div>
+<span class="font-medium">Start Date</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-text-light-secondary dark:text-text-dark-secondary">September 24, 2024</span>
+<span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary text-2xl">arrow_forward_ios</span>
+</div>
+</button>
+</div>
+</section>
+</div>
+<!-- Floating Action Button -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-t border-border-light dark:border-border-dark">
+<button class="w-full h-14 bg-primary text-[#111714] font-bold rounded-lg text-lg flex items-center justify-center transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
+                Assign to 2 Clients
+            </button>
+</div>
+</div>
+</body></html>

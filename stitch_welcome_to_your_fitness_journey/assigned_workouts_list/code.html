@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Assigned Workouts List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#0df259",
+              "background-light": "#f5f8f6",
+              "background-dark": "#102216",
+            },
+            fontFamily: {
+              "display": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-gray-800 dark:text-white" style="font-size: 28px;">arrow_back_ios_new</span>
+</div>
+<h1 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Workouts</h1>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-gray-800 dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+<span class="material-symbols-outlined" style="font-size: 28px;">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Date Selector Chips -->
+<div class="flex gap-3 px-4 py-3 overflow-x-auto [scrollbar-width:none]">
+<div class="flex flex-col items-center justify-center gap-2 rounded-lg bg-gray-200/50 dark:bg-white/10 p-3 px-4 shrink-0">
+<p class="text-gray-600 dark:text-gray-400 text-xs font-medium leading-normal">MON</p>
+<p class="text-gray-900 dark:text-white text-base font-bold leading-normal">18</p>
+</div>
+<div class="flex flex-col items-center justify-center gap-2 rounded-lg bg-gray-200/50 dark:bg-white/10 p-3 px-4 shrink-0">
+<p class="text-gray-600 dark:text-gray-400 text-xs font-medium leading-normal">TUE</p>
+<p class="text-gray-900 dark:text-white text-base font-bold leading-normal">19</p>
+</div>
+<div class="flex flex-col items-center justify-center gap-2 rounded-lg bg-primary p-3 px-4 shrink-0 shadow-lg shadow-primary/20">
+<p class="text-background-dark text-xs font-bold leading-normal">WED</p>
+<p class="text-background-dark text-base font-bold leading-normal">20</p>
+</div>
+<div class="flex flex-col items-center justify-center gap-2 rounded-lg bg-gray-200/50 dark:bg-white/10 p-3 px-4 shrink-0">
+<p class="text-gray-600 dark:text-gray-400 text-xs font-medium leading-normal">THU</p>
+<p class="text-gray-900 dark:text-white text-base font-bold leading-normal">21</p>
+</div>
+<div class="flex flex-col items-center justify-center gap-2 rounded-lg bg-gray-200/50 dark:bg-white/10 p-3 px-4 shrink-0">
+<p class="text-gray-600 dark:text-gray-400 text-xs font-medium leading-normal">FRI</p>
+<p class="text-gray-900 dark:text-white text-base font-bold leading-normal">22</p>
+</div>
+<div class="flex flex-col items-center justify-center gap-2 rounded-lg bg-gray-200/50 dark:bg-white/10 p-3 px-4 shrink-0">
+<p class="text-gray-600 dark:text-gray-400 text-xs font-medium leading-normal">SAT</p>
+<p class="text-gray-900 dark:text-white text-base font-bold leading-normal">23</p>
+</div>
+<div class="flex flex-col items-center justify-center gap-2 rounded-lg bg-gray-200/50 dark:bg-white/10 p-3 px-4 shrink-0">
+<p class="text-gray-600 dark:text-gray-400 text-xs font-medium leading-normal">SUN</p>
+<p class="text-gray-900 dark:text-white text-base font-bold leading-normal">24</p>
+</div>
+</div>
+<!-- Workout List -->
+<main class="flex-1 px-4 py-2">
+<!-- Section Header: Today -->
+<h3 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] px-0 pb-2 pt-4">Today</h3>
+<div class="flex flex-col gap-3">
+<!-- List Item: Due Today -->
+<div class="flex items-center gap-4 bg-gray-100 dark:bg-white/5 rounded-lg p-4 min-h-[72px] justify-between">
+<div class="flex items-center gap-4">
+<div class="text-gray-900 dark:text-white flex items-center justify-center rounded-lg bg-primary/20 dark:bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined text-primary" style="font-size: 28px;">fitness_center</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Full Body Strength A</p>
+<p class="text-primary text-sm font-medium leading-normal line-clamp-2">Due Today</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-primary text-background-dark text-sm font-bold leading-normal tracking-wide">
+<span class="truncate">Start</span>
+</button>
+</div>
+</div>
+<!-- List Item: Completed -->
+<div class="flex items-center gap-4 bg-gray-100 dark:bg-white/5 rounded-lg p-4 min-h-[72px] justify-between opacity-70">
+<div class="flex items-center gap-4">
+<div class="text-gray-900 dark:text-white flex items-center justify-center rounded-lg bg-gray-200 dark:bg-white/10 shrink-0 size-12">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400" style="font-size: 28px;">directions_run</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Morning Run - 5k</p>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal line-clamp-2">Completed</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-5 bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-white text-sm font-medium leading-normal">
+<span class="truncate">View Details</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Section Header: Tomorrow -->
+<h3 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] px-0 pb-2 pt-8">Tomorrow</h3>
+<div class="flex flex-col gap-3">
+<!-- List Item: Upcoming -->
+<div class="flex items-center gap-4 bg-gray-100 dark:bg-white/5 rounded-lg p-4 min-h-[72px] justify-between">
+<div class="flex items-center gap-4">
+<div class="text-gray-900 dark:text-white flex items-center justify-center rounded-lg bg-gray-200 dark:bg-white/10 shrink-0 size-12">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400" style="font-size: 28px;">self_improvement</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Active Recovery &amp; Stretch</p>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal line-clamp-2">Upcoming</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-5 bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-white text-sm font-medium leading-normal">
+<span class="truncate">Preview</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State Example -->
+<div class="flex flex-col items-center justify-center text-center p-8 mt-8 bg-gray-100 dark:bg-white/5 rounded-lg">
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-500 text-5xl mb-4">event_busy</span>
+<p class="text-gray-900 dark:text-white font-semibold mb-1">No workouts scheduled</p>
+<p class="text-gray-600 dark:text-gray-400 text-sm max-w-xs">Looks like this day is clear. Enjoy a rest day or explore other workouts.</p>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-6 right-6 z-20">
+<button class="flex items-center justify-center size-14 rounded-full bg-primary text-background-dark shadow-2xl shadow-primary/40">
+<span class="material-symbols-outlined" style="font-size: 32px;">add</span>
+</button>
+</div>
+</div>
+</body></html>

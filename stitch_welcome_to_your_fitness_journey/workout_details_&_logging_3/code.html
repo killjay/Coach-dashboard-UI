@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manual Food Logging</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#39E079",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017"
+                    },
+                    fontFamily: {
+                        display: "Lexend"
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        lg: "2rem",
+                        xl: "3rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
+<style type="text/tailwindcss">
+        body {
+            @apply font-display bg-background-light dark:bg-background-dark text-white antialiased;
+        }.custom-checkbox {
+            @apply h-5 w-5 appearance-none rounded border-2 border-[#316843] bg-transparent text-primary focus:ring-0 focus:ring-offset-0 focus:border-[#316843];
+            -webkit-appearance: none
+        }
+        .custom-checkbox:checked {
+            background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAvqLUXeYwkauuY8gX8VH7MlJXsfT_H3d0SPyePUVxXXZrXaef2KYLaHet1RXqFg22XSxVI4NjZ1BMJvgwJMnQdNQZcKLWSuf_s_9HdlzjJ9GTHrqBXuLJgQ6TQZIRtO8LWNBKdyxfyrAVRtvK-zOYqO3LP-6eq8-CKwBAapUDsyiUSPi6VtNT3qbYNdWu2bfpEWLc3P5NpEWn8hDULCDqtZXEmH3Jf9_wgJE5RTqhAYsj3ZoEyIITW23Mv0b66PEDVyhvbdaQ9gmo);
+            @apply border-primary bg-primary bg-center bg-no-repeat;
+        }input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col font-display group/design-root">
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background-dark p-4 pb-2">
+<button class="flex h-12 w-12 items-center justify-center text-white">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-white">Manual Food Logging</h1>
+<div class="flex w-12 items-center justify-end">
+</div>
+</header>
+<main class="flex-1 px-4 pb-28 pt-4">
+<div class="flex flex-col gap-6">
+<div>
+<label class="text-base font-medium leading-normal text-white" for="meal-type">Meal</label>
+<div class="relative mt-2">
+<select class="w-full appearance-none rounded-xl border border-[#316843] bg-[#1a2d21]/50 p-4 pr-10 text-white focus:border-primary focus:outline-none focus:ring-0" id="meal-type">
+<option>Breakfast</option>
+<option>Lunch</option>
+<option>Dinner</option>
+<option>Snacks</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl border border-[#316843] bg-[#1a2d21]/50 p-4">
+<div>
+<label class="text-base font-medium leading-normal text-white" for="food-name">Food Name</label>
+<input class="mt-2 w-full rounded-xl border border-[#316843] bg-background-dark p-4 text-white placeholder:text-[#90cba4]/60 focus:border-primary focus:outline-none focus:ring-0" id="food-name" placeholder="e.g. Grilled Chicken Breast" type="text"/>
+</div>
+<div class="flex items-end gap-3">
+<div class="flex-1">
+<label class="text-base font-medium leading-normal text-white" for="serving-size">Serving Size</label>
+<input class="mt-2 w-full rounded-xl border border-[#316843] bg-background-dark p-4 text-center text-white placeholder:text-[#90cba4]/60 focus:border-primary focus:outline-none focus:ring-0" id="serving-size" placeholder="100" type="number"/>
+</div>
+<div class="relative w-28">
+<select class="w-full appearance-none rounded-xl border border-[#316843] bg-background-dark p-4 pr-10 text-center text-white focus:border-primary focus:outline-none focus:ring-0" id="serving-unit">
+<option>g</option>
+<option>oz</option>
+<option>cup</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white">expand_more</span>
+</div>
+</div>
+</div>
+<div>
+<p class="text-base font-medium leading-normal text-white">Estimated Breakdown</p>
+<div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+<div class="flex flex-col gap-2 rounded-xl border border-[#316843] bg-[#1a2d21]/50 p-3">
+<label class="text-sm font-normal text-[#90cba4]" for="calories">Calories</label>
+<input class="w-full border-0 bg-transparent p-0 text-lg font-semibold text-white focus:outline-none focus:ring-0" id="calories" placeholder="220" type="number"/>
+</div>
+<div class="flex flex-col gap-2 rounded-xl border border-[#316843] bg-[#1a2d21]/50 p-3">
+<label class="text-sm font-normal text-[#90cba4]" for="protein">Protein (g)</label>
+<input class="w-full border-0 bg-transparent p-0 text-lg font-semibold text-white focus:outline-none focus:ring-0" id="protein" placeholder="35" type="number"/>
+</div>
+<div class="flex flex-col gap-2 rounded-xl border border-[#316843] bg-[#1a2d21]/50 p-3">
+<label class="text-sm font-normal text-[#90cba4]" for="carbs">Carbs (g)</label>
+<input class="w-full border-0 bg-transparent p-0 text-lg font-semibold text-white focus:outline-none focus:ring-0" id="carbs" placeholder="0" type="number"/>
+</div>
+<div class="flex flex-col gap-2 rounded-xl border border-[#316843] bg-[#1a2d21]/50 p-3">
+<label class="text-sm font-normal text-[#90cba4]" for="fat">Fat (g)</label>
+<input class="w-full border-0 bg-transparent p-0 text-lg font-semibold text-white focus:outline-none focus:ring-0" id="fat" placeholder="8" type="number"/>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-background-dark to-transparent p-4 pb-6 pt-8">
+<button class="w-full rounded-full bg-primary py-4 text-center text-base font-bold text-background-dark">
+            Log Food Item
+        </button>
+</footer>
+</div>
+
+</body></html>

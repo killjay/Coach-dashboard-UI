@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach: Client Profile View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#36e278",
+            "background-light": "#f6f8f7",
+            "background-dark": "#112117",
+          },
+          fontFamily: {
+            "display": ["Lexend", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4 justify-between border-b border-white/10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white text-2xl">arrow_back_ios_new</span>
+</div>
+<h2 class="text-zinc-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Jane Doe</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-zinc-900 dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+<span class="material-symbols-outlined text-2xl">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Main Content -->
+<main class="flex-1">
+<!-- Profile Header -->
+<div class="flex p-4 @container">
+<div class="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
+<div class="flex gap-4 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-24 w-24" data-alt="Profile picture of Jane Doe" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC__vK5Cm0A1Ay5dEDHcb8T2v22r20Aeo5NRn0NvycGpgq-ezSz5xwI8I7gU1denv1ieGTxbexsPEMsFYZtrWkvir5e_RtQ7qJJyBFj4l8AFOAdBuIYUb76vTvqyuWHxOxMbFlWfd7QmkLDscUYpcWSPRfcIjaF0-VSoitC5kbvfKFmL7cBI4gnAvpEeK7gkK5P0fRv_jMTHEqFa8_plsVnb-K2fUY_09Z-xANA_ZZ9ujoyJnZFzsBr5iCnqyTkFQLn3xeQDsw01Sc");'></div>
+<div class="flex flex-col justify-center">
+<p class="text-zinc-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Jane Doe</p>
+<p class="text-zinc-500 dark:text-zinc-400 text-base font-normal leading-normal">Goal: Fat Loss</p>
+<div class="flex gap-2 mt-1">
+<span class="text-xs font-medium text-primary bg-primary/20 px-2 py-1 rounded-full">Active</span>
+<span class="text-xs font-medium text-primary bg-primary/20 px-2 py-1 rounded-full">PCOS</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Actions Bar -->
+<div class="px-4 pb-4">
+<div class="gap-2 grid-cols-[repeat(auto-fit,minmax(80px,1fr))] grid">
+<div class="flex flex-col items-center gap-2 py-2.5 text-center">
+<div class="rounded-full bg-zinc-200 dark:bg-zinc-800 p-3">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white text-2xl">chat</span>
+</div>
+<p class="text-zinc-700 dark:text-zinc-300 text-sm font-medium leading-normal">Message</p>
+</div>
+<div class="flex flex-col items-center gap-2 py-2.5 text-center">
+<div class="rounded-full bg-zinc-200 dark:bg-zinc-800 p-3">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white text-2xl">assignment</span>
+</div>
+<p class="text-zinc-700 dark:text-zinc-300 text-sm font-medium leading-normal">Assign Plan</p>
+</div>
+<div class="flex flex-col items-center gap-2 py-2.5 text-center">
+<div class="rounded-full bg-zinc-200 dark:bg-zinc-800 p-3">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white text-2xl">note_add</span>
+</div>
+<p class="text-zinc-700 dark:text-zinc-300 text-sm font-medium leading-normal">Add Note</p>
+</div>
+</div>
+</div>
+<!-- Tabs -->
+<div class="pb-3 sticky top-[72px] bg-background-light dark:bg-background-dark z-10">
+<div class="flex border-b border-zinc-200 dark:border-zinc-800 px-4 justify-between">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-primary pb-[13px] pt-4 flex-1" href="#">
+<p class="text-primary text-sm font-bold leading-normal tracking-[0.015em]">Overview</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-zinc-500 dark:text-zinc-400 pb-[13px] pt-4 flex-1" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Plans</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-zinc-500 dark:text-zinc-400 pb-[13px] pt-4 flex-1" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Logs</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-zinc-500 dark:text-zinc-400 pb-[13px] pt-4 flex-1" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Data</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-zinc-500 dark:text-zinc-400 pb-[13px] pt-4 flex-1" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Chat</p>
+</a>
+</div>
+</div>
+<!-- Overview Content -->
+<div class="p-4 space-y-6">
+<!-- This Week's Snapshot -->
+<section>
+<h2 class="text-zinc-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] pb-3">This Week's Snapshot</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg">
+<p class="text-sm text-zinc-500 dark:text-zinc-400 mb-1">Adherence</p>
+<p class="text-3xl font-bold text-primary">85%</p>
+</div>
+<div class="bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg">
+<p class="text-sm text-zinc-500 dark:text-zinc-400 mb-1">Workouts</p>
+<p class="text-3xl font-bold text-zinc-900 dark:text-white">4/5</p>
+</div>
+</div>
+</section>
+<!-- Progress Charts -->
+<section>
+<div class="flex justify-between items-center pb-3">
+<h2 class="text-zinc-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">Progress</h2>
+<a class="text-primary text-sm font-bold" href="#">View All</a>
+</div>
+<div class="bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg space-y-4">
+<div>
+<p class="text-zinc-900 dark:text-white font-semibold">Bodyweight</p>
+<p class="text-sm text-zinc-500 dark:text-zinc-400">145.2 lbs</p>
+</div>
+<div class="w-full h-32 bg-zinc-200 dark:bg-zinc-800 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-zinc-400 dark:text-zinc-600">show_chart</span>
+</div>
+</div>
+</section>
+<!-- Recent Activity -->
+<section>
+<div class="flex justify-between items-center pb-3">
+<h2 class="text-zinc-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">Recent Activity</h2>
+<a class="text-primary text-sm font-bold" href="#">See Logs</a>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-4 bg-zinc-100 dark:bg-zinc-900 p-3 rounded-lg">
+<div class="bg-primary/20 p-2 rounded-full">
+<span class="material-symbols-outlined text-primary">fitness_center</span>
+</div>
+<div class="flex-1">
+<p class="font-semibold text-zinc-900 dark:text-white">Upper Body Workout</p>
+<p class="text-sm text-zinc-500 dark:text-zinc-400">Today</p>
+</div>
+<span class="material-symbols-outlined text-zinc-400 dark:text-zinc-500">chevron_right</span>
+</div>
+<div class="flex items-center gap-4 bg-zinc-100 dark:bg-zinc-900 p-3 rounded-lg">
+<div class="bg-primary/20 p-2 rounded-full">
+<span class="material-symbols-outlined text-primary">restaurant</span>
+</div>
+<div class="flex-1">
+<p class="font-semibold text-zinc-900 dark:text-white">Nutrition Log</p>
+<p class="text-sm text-zinc-500 dark:text-zinc-400">Yesterday</p>
+</div>
+<span class="material-symbols-outlined text-zinc-400 dark:text-zinc-500">chevron_right</span>
+</div>
+<div class="flex items-center gap-4 bg-zinc-100 dark:bg-zinc-900 p-3 rounded-lg">
+<div class="bg-primary/20 p-2 rounded-full">
+<span class="material-symbols-outlined text-primary">photo_camera</span>
+</div>
+<div class="flex-1">
+<p class="font-semibold text-zinc-900 dark:text-white">Progress Photos</p>
+<p class="text-sm text-zinc-500 dark:text-zinc-400">2 days ago</p>
+</div>
+<span class="material-symbols-outlined text-zinc-400 dark:text-zinc-500">chevron_right</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

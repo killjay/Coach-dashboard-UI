@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "396401351440",
+    "project_id": "coach-dashboard-1",
+    "storage_bucket": "coach-dashboard-1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:396401351440:android:bafc9523dfe6ab214f2395",
+        "android_client_info": {
+          "package_name": "com.coachdashboard.coach_dashboard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4D8cr9gf6URy08V4eAg_aLDx17Qf33No"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

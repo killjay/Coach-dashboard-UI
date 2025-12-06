@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>View Diet Plan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#39E079",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017"
+                    },
+                    fontFamily: {
+                        display: "Lexend"
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        lg: "2rem",
+                        xl: "3rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            @apply font-display bg-background-light dark:bg-background-dark text-white antialiased;
+        }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col font-display group/design-root">
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background-dark p-4 pb-2">
+<button class="flex h-12 w-12 items-center justify-center text-white">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-white">Daily Meal Plan</h1>
+<div class="flex w-12 items-center justify-end">
+<button class="flex h-12 cursor-pointer items-center justify-center rounded-full bg-transparent text-white">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<main class="flex-1 px-4 pt-4 pb-28">
+<div class="mb-6 flex justify-between items-center text-white">
+<button class="p-2">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="text-center">
+<p class="font-bold text-lg">Today</p>
+<p class="text-sm text-[#90cba4]">October 26</p>
+</div>
+<button class="p-2">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div class="grid grid-cols-3 gap-3 rounded-xl bg-[#1a2d21] p-4 text-center mb-6">
+<div>
+<p class="text-sm font-medium text-[#90cba4]">Calories</p>
+<p class="text-lg font-bold text-white">2,150</p>
+</div>
+<div>
+<p class="text-sm font-medium text-[#90cba4]">Protein</p>
+<p class="text-lg font-bold text-white">180g</p>
+</div>
+<div>
+<p class="text-sm font-medium text-[#90cba4]">Carbs</p>
+<p class="text-lg font-bold text-white">220g</p>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col rounded-xl border border-[#316843] bg-background-dark">
+<div class="flex justify-between items-center p-4">
+<div class="flex flex-col">
+<p class="text-base font-medium leading-normal text-white">Breakfast</p>
+<p class="text-sm font-normal leading-normal text-[#90cba4]">450 Cals</p>
+</div>
+</div>
+<div class="flex flex-col border-t border-[#316843] bg-[#1a2d21]/50 px-4">
+<div class="flex justify-between items-center py-3 border-b border-[#316843]">
+<p class="text-white">Scrambled Eggs</p>
+<p class="text-[#90cba4]">3 large</p>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-[#316843]">
+<p class="text-white">Whole Wheat Toast</p>
+<p class="text-[#90cba4]">2 slices</p>
+</div>
+<div class="flex justify-between items-center py-3">
+<p class="text-white">Avocado</p>
+<p class="text-[#90cba4]">1/2 medium</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col rounded-xl border border-[#316843] bg-background-dark">
+<div class="flex justify-between items-center p-4">
+<div class="flex flex-col">
+<p class="text-base font-medium leading-normal text-white">Lunch</p>
+<p class="text-sm font-normal leading-normal text-[#90cba4]">650 Cals</p>
+</div>
+</div>
+<div class="flex flex-col border-t border-[#316843] bg-[#1a2d21]/50 px-4">
+<div class="flex justify-between items-center py-3 border-b border-[#316843]">
+<p class="text-white">Grilled Chicken Breast</p>
+<p class="text-[#90cba4]">200g</p>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-[#316843]">
+<p class="text-white">Quinoa</p>
+<p class="text-[#90cba4]">1 cup cooked</p>
+</div>
+<div class="flex justify-between items-center py-3">
+<p class="text-white">Steamed Broccoli</p>
+<p class="text-[#90cba4]">1 cup</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col rounded-xl border border-[#316843] bg-background-dark">
+<div class="flex justify-between items-center p-4">
+<div class="flex flex-col">
+<p class="text-base font-medium leading-normal text-white">Dinner</p>
+<p class="text-sm font-normal leading-normal text-[#90cba4]">600 Cals</p>
+</div>
+</div>
+<div class="flex flex-col border-t border-[#316843] bg-[#1a2d21]/50 px-4">
+<div class="flex justify-between items-center py-3 border-b border-[#316843]">
+<p class="text-white">Salmon Fillet</p>
+<p class="text-[#90cba4]">150g</p>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-[#316843]">
+<p class="text-white">Sweet Potato</p>
+<p class="text-[#90cba4]">1 medium</p>
+</div>
+<div class="flex justify-between items-center py-3">
+<p class="text-white">Asparagus</p>
+<p class="text-[#90cba4]">1 cup</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col rounded-xl border border-[#316843] bg-background-dark">
+<div class="flex justify-between items-center p-4">
+<div class="flex flex-col">
+<p class="text-base font-medium leading-normal text-white">Snack</p>
+<p class="text-sm font-normal leading-normal text-[#90cba4]">450 Cals</p>
+</div>
+</div>
+<div class="flex flex-col border-t border-[#316843] bg-[#1a2d21]/50 px-4">
+<div class="flex justify-between items-center py-3 border-b border-[#316843]">
+<p class="text-white">Greek Yogurt</p>
+<p class="text-[#90cba4]">1 cup</p>
+</div>
+<div class="flex justify-between items-center py-3">
+<p class="text-white">Almonds</p>
+<p class="text-[#90cba4]">1/4 cup</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-background-dark to-transparent p-4 pb-6 pt-8">
+<button class="w-full rounded-full bg-primary py-4 text-center text-base font-bold text-background-dark flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">restaurant_menu</span>
+            Log My Meals
+        </button>
+</footer>
+</div>
+
+</body></html>

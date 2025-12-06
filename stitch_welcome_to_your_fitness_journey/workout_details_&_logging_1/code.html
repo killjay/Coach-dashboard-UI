@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Workout Details &amp; Logging</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0df259",
+            "background-light": "#f5f8f6",
+            "background-dark": "#101010",
+            "card": "#1c1c1e",
+            "card-border": "#2c2c2e",
+            "text-secondary": "#8e8e93",
+          },
+          fontFamily: {
+            "display": ["Lexend", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "1.5rem",
+            "xl": "2rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style type="text/tailwindcss">body {
+    @apply font-display bg-background-dark text-white antialiased;
+    }.custom-checkbox {
+    @apply h-8 w-8 appearance-none rounded-full border-2 border-card-border bg-card text-primary focus: ring-0 focus: ring-offset-0;
+    -webkit-appearance: none
+    }
+.custom-checkbox:checked {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuA3mb0FDB97tXwokG5C9pxrsTs90548gOQ0-ffoXenhCKM2Fy7W_Os5TiUgES7a02G_o8BODxYQ3BkauBw2f0g1Jv7uvPF5L04DuGn-v_ohNzBtIy_E3pwV_mlilvRkLtuUtkqXGx7Xkx9aKET0wtqUgse6m2__ptn8HVXNLIzWHCSyxbFjil4vul_3zThB9pHFUxS8aSwt_0qRo0XJnTgZFX4Rpbpr_cZbnoRFJaLnTOU3DL-wPvsRsFwmxwClFBxBfDTPKiIz5gg);
+    @apply border-primary bg-primary bg-center bg-no-repeat;
+    }input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0
+    }
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col font-display group/design-root">
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background-dark/80 p-4 pb-2 backdrop-blur-sm">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-card text-white">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-white">Upper Body Strength</h1>
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-card text-white">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</header>
+<main class="flex-1 px-4 pb-32 pt-4">
+<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-3 rounded-lg">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-xl font-bold uppercase tracking-wider text-white">Barbell Bench Press</p>
+<p class="text-sm font-normal text-text-secondary">3 Sets × 8-10 Reps</p>
+</div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1, 'wght' 700; font-size: 28px;">check_circle</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="grid grid-cols-12 items-center gap-3 px-3 py-1 text-xs uppercase text-text-secondary">
+<div class="col-span-1 text-center">SET</div>
+<div class="col-span-5 text-center">PREVIOUS</div>
+<div class="col-span-3 text-center">LBS</div>
+<div class="col-span-3 text-center">REPS</div>
+</div>
+<div class="flex items-center gap-3 rounded-lg bg-primary/20 p-3">
+<span class="text-lg font-bold text-white">1</span>
+<div class="flex-1 text-center text-sm font-medium text-white">225 lbs × 8</div>
+<input class="w-full rounded-md border-0 bg-white/10 p-3 text-center text-base font-medium text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary" type="number" value="225"/>
+<input class="w-full rounded-md border-0 bg-white/10 p-3 text-center text-base font-medium text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary" type="number" value="8"/>
+<input checked="" class="custom-checkbox" type="checkbox"/>
+</div>
+<div class="flex items-center gap-3 rounded-lg bg-card p-3">
+<span class="text-lg font-bold text-white">2</span>
+<div class="flex-1 text-center text-sm font-medium text-text-secondary">225 lbs × 8</div>
+<input class="w-full rounded-md border-0 bg-card-border p-3 text-center text-base font-medium text-white placeholder:text-text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary" placeholder="-" type="number"/>
+<input class="w-full rounded-md border-0 bg-card-border p-3 text-center text-base font-medium text-white placeholder:text-text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary" placeholder="-" type="number"/>
+<input class="custom-checkbox" type="checkbox"/>
+</div>
+<div class="flex items-center gap-3 rounded-lg bg-card p-3">
+<span class="text-lg font-bold text-white">3</span>
+<div class="flex-1 text-center text-sm font-medium text-text-secondary">225 lbs × 8</div>
+<input class="w-full rounded-md border-0 bg-card-border p-3 text-center text-base font-medium text-white placeholder:text-text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary" placeholder="-" type="number"/>
+<input class="w-full rounded-md border-0 bg-card-border p-3 text-center text-base font-medium text-white placeholder:text-text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary" placeholder="-" type="number"/>
+<input class="custom-checkbox" type="checkbox"/>
+</div>
+<button class="mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-3 text-center text-sm font-bold text-primary">
+<span class="material-symbols-outlined">add_circle</span>
+              Add Set
+            </button>
+</div>
+</div>
+<hr class="border-card-border"/>
+<div class="flex flex-col gap-3 rounded-lg">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-xl font-bold uppercase tracking-wider text-white">Pull Ups</p>
+<p class="text-sm font-normal text-text-secondary">3 Sets × 8-10 Reps</p>
+</div>
+<span class="material-symbols-outlined text-text-secondary" style="font-variation-settings: 'FILL' 0, 'wght' 700; font-size: 28px;">radio_button_unchecked</span>
+</div>
+</div>
+<hr class="border-card-border"/>
+<div class="flex flex-col gap-3 rounded-lg">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-xl font-bold uppercase tracking-wider text-white">Dumbbell Shoulder Press</p>
+<p class="text-sm font-normal text-text-secondary">3 Sets × 10-12 Reps</p>
+</div>
+<span class="material-symbols-outlined text-text-secondary" style="font-variation-settings: 'FILL' 0, 'wght' 700; font-size: 28px;">radio_button_unchecked</span>
+</div>
+</div>
+<hr class="border-card-border"/>
+<div class="flex flex-col gap-3 rounded-lg">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-xl font-bold uppercase tracking-wider text-white">Tricep Pushdowns</p>
+<p class="text-sm font-normal text-text-secondary">3 Sets × 12-15 Reps</p>
+</div>
+<span class="material-symbols-outlined text-text-secondary" style="font-variation-settings: 'FILL' 0, 'wght' 700; font-size: 28px;">radio_button_unchecked</span>
+</div>
+</div>
+</div>
+</main>
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-background-dark via-background-dark/90 to-transparent p-4 pb-6 pt-10">
+<button class="w-full transform rounded-full bg-primary py-4 text-center text-lg font-extrabold text-black transition-transform active:scale-95">
+        MARK AS COMPLETE
+      </button>
+</footer>
+</div>
+
+</body></html>

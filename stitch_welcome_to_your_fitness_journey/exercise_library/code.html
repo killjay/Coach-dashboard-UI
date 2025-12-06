@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exercise Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#0df259",
+              "background-light": "#f5f8f6",
+              "background-dark": "#102216",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<!-- Main Content Area -->
+<main class="flex-1 pb-24">
+<!-- Top App Bar -->
+<div class="flex items-center p-4 pb-2 justify-between bg-background-light dark:bg-background-dark sticky top-0 z-10">
+<div class="text-white flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white">arrow_back_ios_new</span>
+</div>
+<h2 class="text-zinc-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Exercise Library</h2>
+<div class="flex size-12 shrink-0 items-center"></div> <!-- Spacer -->
+</div>
+<!-- Search Bar -->
+<div class="px-4 py-3">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-full h-full bg-zinc-200/50 dark:bg-[#22492f]">
+<div class="text-zinc-500 dark:text-primary/70 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-zinc-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-zinc-500 dark:placeholder:text-primary/70 px-2 text-base font-normal leading-normal" placeholder="Search exercises..." value=""/>
+</div>
+</label>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-3 p-3 pl-4 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none]">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary pl-4 pr-4">
+<p class="text-background-dark text-sm font-medium leading-normal">All</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-zinc-200/50 dark:bg-[#22492f] pl-4 pr-4">
+<p class="text-zinc-900 dark:text-white text-sm font-medium leading-normal">Chest</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-zinc-200/50 dark:bg-[#22492f] pl-4 pr-4">
+<p class="text-zinc-900 dark:text-white text-sm font-medium leading-normal">Legs</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-zinc-200/50 dark:bg-[#22492f] pl-4 pr-4">
+<p class="text-zinc-900 dark:text-white text-sm font-medium leading-normal">Core</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-zinc-200/50 dark:bg-[#22492f] pl-4 pr-4">
+<p class="text-zinc-900 dark:text-white text-sm font-medium leading-normal">Cardio</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-zinc-200/50 dark:bg-[#22492f] pl-4 pr-4">
+<p class="text-zinc-900 dark:text-white text-sm font-medium leading-normal">Arms</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-zinc-200/50 dark:bg-[#22492f] pl-4 pr-4">
+<p class="text-zinc-900 dark:text-white text-sm font-medium leading-normal">Back</p>
+</div>
+</div>
+<!-- Image Grid -->
+<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-4 p-4">
+<div class="flex flex-col gap-2">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="Athlete performing a barbell bench press" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCXYJvfeEkTPnBl_Cqt6Qx36RoDNx_ADCrToslz6goF9uJDbugcGrFU6zBjU3wcu2-i3bnvO4eBD6khpaiRpGtbnkMS081dwyWEaoCoSWGV-hgXWiAaxgfzTolxNXKVS5XfN79iQPjn7oRwDZUuMhv7ahn8zzNzVSNq9xYeL6Upx3DOR_ZNvkv2zv75T4BZ5BKg8s4dNf3KPGnV9QWkdJVpIk9Nn-q9AG72eaLYbAT3JTwGK8UWofmFoqu81NE9uJ43cSidLEr3bc8");'></div>
+<div>
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal">Barbell Bench Press</p>
+<p class="text-zinc-500 dark:text-primary/70 text-sm font-normal leading-normal">Chest</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="Athlete performing a dumbbell bicep curl" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCuZvNpkobxgXgYYCak8H3NQdrgFR6Wr79spSlypNDSTlRiOJjEmQnF9nmDGZTDLC_LJbCKl-whnjJH33TQDid5xHeWAHq1nv1Dbl6YdVU0jooUapmlG6pILfoDBCr7o2nr4bFuVsDVAijCTwH9PXEw0yYeg3aHnL0wRNHjFYLFueR03XtvpBeDf5qQmH9haASC_4O2daaf5M_P5aqoakF56bTlnvUJvDP3HGCmvhsNPMC7t3TbSU0ai0C3tXj0KDY5MyaB3bPahdo");'></div>
+<div>
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal">Dumbbell Bicep Curl</p>
+<p class="text-zinc-500 dark:text-primary/70 text-sm font-normal leading-normal">Arms</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="Athlete at the bottom of a barbell squat" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCr60ZOT1Lp1wqYNpJHw9W4mQUbbbixRnK1jsXGw6nbkaKtfAEX-Evso08rpU_z03J0ECbN5l74iGQUMvCrYFMitN_wfXy0dqmLQQPjJvAAq5XUpWYi92jwlBw94M0GIXmrlgKqd_ZkU-_DuY-d2aFKQmgjM1RQHPIYAFqb4_4Cur8_a7lbi8dQ64AIDbdzL4pCoinY0Ebgyv9-LA-VyHhr2LlAQ44mefu-DvTgvZ6B-PEq2W76W2ZFAHcxlsmlKXXhHIqWGNRbYds");'></div>
+<div>
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal">Barbell Squat</p>
+<p class="text-zinc-500 dark:text-primary/70 text-sm font-normal leading-normal">Legs</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="Athlete holding a plank position" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBAFEfoLne7_xyEheB5uSae4V8DzgoHwe0-iQaIMZQt2gV5UpvrmA9I_CAxDaZICkIEPwmaIA1qr2a9DX2dTov8xM10WjJbbDyYxIlCg98hNhu_rc9u0wVVkbSlTHzmLRj8J7Qcf8UZNLnkizgjra75X3_gREtuJmkNpbYwHnx8UvRugoV8QKWH5dgJIIiw38x2LVtnCxsOVwA-m4UpK4yUBS27ibIiuIBHzqF1jkzHt-J-wcZn1NkKkPkduSSH6in0RXxUUqvOXEk");'></div>
+<div>
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal">Plank</p>
+<p class="text-zinc-500 dark:text-primary/70 text-sm font-normal leading-normal">Core</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="Person running on a treadmill" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDisDtMVlpORmvu3xok2wwb8YogxmlLrahngsGtgcciDkJ3eCzHZFsieuUhpyfEwTqaFEvXERYhkUTuhmZz7Ro4D6H9nRhHHCTHDBh342Jn3TQpwtbLZyF0YcX-fHmLQWV0lnTNGC_0PtFsojTiT_HMDAUf5AEW6sqRlrjuPn-XWJlNFaHwl_uWgtxkYFCwB341YKXhD76Q6DNEiEMPPTCCe-yEhp90jlu7asvyiXpPXEdt4eKbMcj4fsv_wZuICbtkTwDWq4olAio");'></div>
+<div>
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal">Treadmill Run</p>
+<p class="text-zinc-500 dark:text-primary/70 text-sm font-normal leading-normal">Cardio</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg" data-alt="Athlete performing a lat pulldown exercise" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuApSj6J2i5QDopLUlw3NuGfyjW_1EkOf9ool4lStk4NF7oWyyhtIVaOTVgKeTtBuM3OhPyvfnbAcrY7hqSa3PW88DzIcFDzMjRnWkPOAxvz_Lz_jZgu7NKUYl0QwnMQ0anZVfJxlUH2TBlI4nvtUeqrZXyAMEicI_TGRhnpvEL8HOnfTZG-JnB01Nmq2IvQbKqvF0ikON6dnwDQuexQU1Zf7VRzNQRAjWSKa2N54eA1PpCkLpUUxq0YBHBJL1sF9OC97wEfZOjIUew");'></div>
+<div>
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal">Lat Pulldown</p>
+<p class="text-zinc-500 dark:text-primary/70 text-sm font-normal leading-normal">Back</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<footer class="fixed bottom-0 left-0 right-0 z-20">
+<div class="flex border-t border-zinc-200/80 dark:border-[#22492f] bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-lg px-4 pb-3 pt-2">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-zinc-500 dark:text-primary/70" href="#">
+<span class="material-symbols-outlined h-8 flex items-center justify-center">home</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-zinc-500 dark:text-primary/70" href="#">
+<span class="material-symbols-outlined h-8 flex items-center justify-center">fitness_center</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Workouts</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined h-8 flex items-center justify-center" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<p class="text-primary text-xs font-bold leading-normal tracking-[0.015em]">Library</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-zinc-500 dark:text-primary/70" href="#">
+<span class="material-symbols-outlined h-8 flex items-center justify-center">person</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Profile</p>
+</a>
+</div>
+</footer>
+</div>
+</body></html>

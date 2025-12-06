@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Community Leaderboards</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#36e278",
+            "background-light": "#f6f8f7",
+            "background-dark": "#112117",
+          },
+          fontFamily: {
+            "display": ["Lexend"]
+          },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-zinc-900 dark:text-white text-2xl">arrow_back_ios_new</span>
+</div>
+<h2 class="text-zinc-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Community Leaderboards</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-zinc-900 dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+<span class="material-symbols-outlined text-2xl">search</span>
+</button>
+</div>
+</div>
+<!-- Segmented Buttons -->
+<div class="flex px-4 py-3 sticky top-[72px] z-10 bg-background-light dark:bg-background-dark">
+<div class="flex h-10 flex-1 items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-800 p-1">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-background-dark dark:has-[:checked]:bg-zinc-900/50 has-[:checked]:shadow-[0_1px_3px_rgba(0,0,0,0.1)] has-[:checked]:text-white text-zinc-600 dark:text-zinc-400 text-sm font-medium leading-normal">
+<span class="truncate">Daily Steps</span>
+<input checked="" class="invisible w-0" name="leaderboard-toggle" type="radio" value="Daily Steps"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-background-dark dark:has-[:checked]:bg-zinc-900/50 has-[:checked]:shadow-[0_1px_3px_rgba(0,0,0,0.1)] has-[:checked]:text-white text-zinc-600 dark:text-zinc-400 text-sm font-medium leading-normal">
+<span class="truncate">Monthly Steps</span>
+<input class="invisible w-0" name="leaderboard-toggle" type="radio" value="Monthly Steps"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-background-dark dark:has-[:checked]:bg-zinc-900/50 has-[:checked]:shadow-[0_1px_3px_rgba(0,0,0,0.1)] has-[:checked]:text-white text-zinc-600 dark:text-zinc-400 text-sm font-medium leading-normal">
+<span class="truncate">Workout Consistency</span>
+<input class="invisible w-0" name="leaderboard-toggle" type="radio" value="Workout Consistency"/>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-2 px-4 py-4">
+<!-- Podium: 1st Place -->
+<div class="flex items-center gap-4 bg-zinc-200/50 dark:bg-[#FFD700]/10 p-4 min-h-[72px] justify-between rounded-lg border border-transparent dark:border-[#FFD700]/30">
+<div class="flex items-center gap-4">
+<p class="text-2xl font-bold text-zinc-500 dark:text-[#FFD700]">1</p>
+<img class="h-14 w-14 rounded-full object-cover" data-alt="Profile picture of Elara Vance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdl0CuyGoiBNh3WE-YmSo3myRfrCtcShq4tO2oW4pzf6Sl3qw9FhPpLocG_nB23nec11aVf2skxW6Yr0zD1YjG9m6EBYPA59s93VXTn93OKMWcxu5fQfV4Yj6kqcX9HBJOq1VKu7wI_2og68xV42Q4iB9F015AGk70PVEl87f-MphOM8Uv5pVGm1YwkUcdaiJuZDz-69tPN3hQUmQxjxUZ9ndVuGemVlNS_Na9gv-1xYLNLVBiasKu7YOvX9K2TCad6l2lDTQHEiM"/>
+<div class="flex flex-col justify-center">
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Elara Vance</p>
+<p class="text-zinc-600 dark:text-zinc-400 text-sm font-normal leading-normal line-clamp-2">15,890 steps</p>
+</div>
+</div>
+<div class="shrink-0 flex items-center justify-center size-12 rounded-full border-2 border-primary bg-primary/20">
+<p class="text-primary text-base font-bold">98</p>
+</div>
+</div>
+<!-- Podium: 2nd Place -->
+<div class="flex items-center gap-4 bg-zinc-200/50 dark:bg-[#C0C0C0]/10 p-4 min-h-[72px] justify-between rounded-lg border border-transparent dark:border-[#C0C0C0]/30">
+<div class="flex items-center gap-4">
+<p class="text-2xl font-bold text-zinc-500 dark:text-[#C0C0C0]">2</p>
+<img class="h-14 w-14 rounded-full object-cover" data-alt="Profile picture of Kenji Tanaka" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2LjIyrQwbbEExTYy7P5ye9ofpL7dV7ApRkj_AfrxCTAvEyzAt5lEHfGPboELzXSwXmfS1ETlZvBw8t147dPEgn1ttYrl4A9DjUUab6DTvupTkWT1MTpaq0AUHmqCxYVOlwu_Ipd2gcBNeNrdPpX3Z_IWVJttUm9ntAwLtY_2CJZWqQvSheKshWFgGAAQeKSOM3liSCfxM1zELX9ZiQWGuLl4A9RBtxDfu5VveRH6oZuo8H6sf3T8ONt7Kf1yy9vAe8RuHoVIRCz0"/>
+<div class="flex flex-col justify-center">
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Kenji Tanaka</p>
+<p class="text-zinc-600 dark:text-zinc-400 text-sm font-normal leading-normal line-clamp-2">14,500 steps</p>
+</div>
+</div>
+<div class="shrink-0 flex items-center justify-center size-12 rounded-full border-2 border-primary bg-primary/20">
+<p class="text-primary text-base font-bold">95</p>
+</div>
+</div>
+<!-- Podium: 3rd Place -->
+<div class="flex items-center gap-4 bg-zinc-200/50 dark:bg-[#CD7F32]/10 p-4 min-h-[72px] justify-between rounded-lg border border-transparent dark:border-[#CD7F32]/30">
+<div class="flex items-center gap-4">
+<p class="text-2xl font-bold text-zinc-500 dark:text-[#CD7F32]">3</p>
+<img class="h-14 w-14 rounded-full object-cover" data-alt="Profile picture of Anya Petrova" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5caWwPuFM9Y-NCieOQHasxE_-XS7sOLUYAFP1Ek-5B-aoMRcaUoEXlx2gZdEQYioqYcOhxnhaLcf8rlL0B-lkd8e62uHFYo1h6qp2psaqnrbVOj3jfZ2bGAjwzaH7YnkLMcNIHPYHPoMeS9rpIGgFf4T8XWluqqQUMIPUwBn_1J7Rs3sVdLssQY46v7gwfBD5uNl6eiuYVRE9xG9nNKVDrfKm5sqk06gInVeNSYN9Kq94A-IMbvrijf2zTgFHQxu6xTG6NjTcHK0"/>
+<div class="flex flex-col justify-center">
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Anya Petrova</p>
+<p class="text-zinc-600 dark:text-zinc-400 text-sm font-normal leading-normal line-clamp-2">13,980 steps</p>
+</div>
+</div>
+<div class="shrink-0 flex items-center justify-center size-12 rounded-full border-2 border-primary bg-primary/20">
+<p class="text-primary text-base font-bold">92</p>
+</div>
+</div>
+<!-- Other participants -->
+<div class="flex items-center gap-4 bg-transparent p-4 min-h-[72px] justify-between rounded-lg">
+<div class="flex items-center gap-4">
+<p class="text-2xl font-bold text-zinc-400 dark:text-zinc-500 w-6 text-center">4</p>
+<img class="h-14 w-14 rounded-full object-cover" data-alt="Profile picture of Lena Schmidt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRfP1sSyPVzZgMPstG1Qitf5IhTRuYE0x43CekkpH3VDiR94Y7yVNJPIPczovXqp0bIm3QhLiq-rGAtdQHhCSdfc2feruvTc2K-4cvAu50n2hM8us-4YAkjcwYghKbIAhfvphTjjfYladc8rvEjsZrQRqgXlFTZuq-BUvEK-Yk3-SAoiaphG-J0m0MCltMBNkdWSgtf9QSyGYDIaQXCBvkWnGSa42NqYaPjkbOSimhMt2qjRN5wpVPkVHgK1TONeFZIxXxmNJ1A2g"/>
+<div class="flex flex-col justify-center">
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Lena Schmidt</p>
+<p class="text-zinc-600 dark:text-zinc-400 text-sm font-normal leading-normal line-clamp-2">12,110 steps</p>
+</div>
+</div>
+<div class="shrink-0 flex items-center justify-center size-12 rounded-full border-2 border-zinc-300 dark:border-zinc-700">
+<p class="text-zinc-900 dark:text-white text-base font-bold">88</p>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-transparent p-4 min-h-[72px] justify-between rounded-lg">
+<div class="flex items-center gap-4">
+<p class="text-2xl font-bold text-zinc-400 dark:text-zinc-500 w-6 text-center">5</p>
+<img class="h-14 w-14 rounded-full object-cover" data-alt="Profile picture of Marco Rossi" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9cqQo6-cDLo_U9Bq-OEo5Rct7hwmTJfwqIBgp0TM0IINKEMzrOS0oojC643xEM-1wQwm4gjr6ylwPUSbG5aV3tkrJNyVeSNRZi9ZDZYMIKY1sxJ11jZ-doeiAtlShuar8i7CGt0zC7VY7j0oQVGWy4dl0BRsBXzTig6TynVZBqgwn2wdOCd-j993sVYtNWFdc1_LIJ9b2rVdmvEOIqPDqwSnZdieSIDH-UPOzxY_2Fbf1f61sGPty8CMofhLBfgmU5TIADAoUYeY"/>
+<div class="flex flex-col justify-center">
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal line-clamp-1">Marco Rossi</p>
+<p class="text-zinc-600 dark:text-zinc-400 text-sm font-normal leading-normal line-clamp-2">11,540 steps</p>
+</div>
+</div>
+<div class="shrink-0 flex items-center justify-center size-12 rounded-full border-2 border-zinc-300 dark:border-zinc-700">
+<p class="text-zinc-900 dark:text-white text-base font-bold">85</p>
+</div>
+</div>
+</div>
+<!-- Sticky "My Rank" Card -->
+<div class="sticky bottom-0 mt-auto p-4 bg-gradient-to-t from-background-light dark:from-background-dark to-transparent">
+<div class="flex items-center gap-4 bg-primary/20 p-3 justify-between rounded-lg border border-primary/50 shadow-lg backdrop-blur-sm">
+<div class="flex items-center gap-4">
+<p class="text-2xl font-bold text-primary w-6 text-center">10</p>
+<img class="h-14 w-14 rounded-full object-cover border-2 border-primary" data-alt="Profile picture of the current user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR3TDisZLF7LzvETXgmuxasOLoCtgPhfy2Do6M_gEa5NQ_7WhjlcttanRYvQ_81OVLD7m238c2RozAzsZm3YyZdH0zXUNutHRoFANmbZcSAFt5Romp-ZzZZYiPIBQ2-XH1Q-btTR2niD9VtAxnLk955oE4FX9iMi-8e5qmar-b6Vr96_sUyy2ZJ8bi-XLjFKOpx_vtoqejjvPwVmYAN8FimNpCkuxpT7R13EFyQY4mS304e0cjcJi9MS9Hww7AtDKs443qc9JCS7E"/>
+<div class="flex flex-col justify-center">
+<p class="text-zinc-900 dark:text-white text-base font-medium leading-normal line-clamp-1">You</p>
+<p class="text-zinc-600 dark:text-zinc-300 text-sm font-normal leading-normal line-clamp-2">8,230 steps</p>
+</div>
+</div>
+<div class="shrink-0 flex items-center justify-center size-12 rounded-full bg-primary">
+<p class="text-background-dark text-base font-bold">75</p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

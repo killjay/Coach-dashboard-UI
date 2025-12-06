@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Leaderboard Privacy Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#111714",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .group:has([name=opt-out]:checked) .group-disabled-on-opt-out {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-dark group/design-root overflow-x-hidden">
+<header class="flex items-center bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-white" style="font-size: 28px;">arrow_back_ios_new</span>
+</div>
+<h1 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Leaderboard Privacy</h1>
+</header>
+<main class="flex flex-col flex-1 px-4 pt-4 pb-8">
+<div class="flex flex-col gap-6 group">
+<section class="flex flex-col bg-[#1A261F] p-1 rounded-lg">
+<div class="flex items-center gap-4 bg-background-dark px-4 min-h-[72px] py-2 justify-between rounded-t-lg">
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Opt-out of Leaderboards</p>
+<p class="text-[#9eb7a8] text-sm font-normal leading-normal line-clamp-2">This will remove your name and score from all leaderboards.</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#29382f] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input class="invisible absolute" name="opt-out" type="checkbox"/>
+</label>
+</div>
+</div>
+<div class="h-px bg-[#1A261F]"></div>
+<div class="flex items-center gap-4 bg-background-dark px-4 min-h-[72px] py-2 justify-between rounded-b-lg group-disabled-on-opt-out">
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Appear Anonymously</p>
+<p class="text-[#9eb7a8] text-sm font-normal leading-normal line-clamp-2">This will show your score, but hide your name and picture.</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#29382f] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+</section>
+</div>
+<div class="flex-grow"></div>
+<p class="text-[#9eb7a8] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">
+                Leaderboards are designed for friendly competition and to help you stay motivated on your fitness journey.
+            </p>
+</main>
+</div>
+</body></html>

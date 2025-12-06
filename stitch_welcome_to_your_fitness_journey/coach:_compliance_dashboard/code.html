@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach: Compliance Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#121212",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<!-- Top App Bar -->
+<header class="p-4 pb-2">
+<div class="flex items-center h-12 justify-between">
+<div class="flex size-12 shrink-0 items-center justify-start text-white">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</div>
+<div class="flex w-auto items-center justify-end">
+<p class="text-[#A9A9A9] dark:text-gray-400 text-base font-bold leading-normal tracking-[0.015em] shrink-0">Last 7 Days</p>
+<span class="material-symbols-outlined text-xl text-[#A9A9A9] dark:text-gray-400">expand_more</span>
+</div>
+</div>
+<h1 class="text-black dark:text-white tracking-light text-[28px] font-bold leading-tight">Compliance</h1>
+</header>
+<!-- Stats -->
+<section class="flex flex-wrap gap-4 p-4">
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-white/5 dark:bg-zinc-900">
+<p class="text-black dark:text-white text-base font-medium leading-normal">Overall Compliance</p>
+<p class="text-black dark:text-white tracking-light text-2xl font-bold leading-tight">82%</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-base text-primary">arrow_upward</span>
+<p class="text-primary text-base font-medium leading-normal">2.5%</p>
+</div>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-white/5 dark:bg-zinc-900">
+<p class="text-black dark:text-white text-base font-medium leading-normal">Workouts Logged</p>
+<p class="text-black dark:text-white tracking-light text-2xl font-bold leading-tight">75%</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-base text-red-500">arrow_downward</span>
+<p class="text-red-500 text-base font-medium leading-normal">1.2%</p>
+</div>
+</div>
+</section>
+<!-- Charts -->
+<section class="flex flex-wrap gap-4 px-4 py-6">
+<div class="flex min-w-72 flex-1 flex-col gap-4 rounded-lg p-6 bg-white/5 dark:bg-zinc-900">
+<div>
+<p class="text-black dark:text-white text-base font-medium leading-normal">Daily Compliance Trend</p>
+<div class="flex items-baseline gap-2">
+<p class="text-black dark:text-white tracking-light text-[32px] font-bold leading-tight truncate">82%</p>
+<p class="text-primary text-base font-medium leading-normal">+2.5%</p>
+</div>
+<p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Last 7 Days</p>
+</div>
+<div class="grid min-h-[180px] grid-flow-col gap-4 grid-rows-[1fr_auto] items-end justify-items-center px-3">
+<div class="bg-gray-200 dark:bg-zinc-800 w-full rounded-full" style="height: 40%;"><div class="bg-primary h-full w-full rounded-full opacity-30"></div></div>
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Mon</p>
+<div class="bg-gray-200 dark:bg-zinc-800 w-full rounded-full" style="height: 90%;"><div class="bg-primary h-full w-full rounded-full opacity-30"></div></div>
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Tue</p>
+<div class="bg-gray-200 dark:bg-zinc-800 w-full rounded-full" style="height: 50%;"><div class="bg-primary h-full w-full rounded-full opacity-30"></div></div>
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Wed</p>
+<div class="bg-gray-200 dark:bg-zinc-800 w-full rounded-full" style="height: 30%;"><div class="bg-primary h-full w-full rounded-full opacity-30"></div></div>
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Thu</p>
+<div class="bg-gray-200 dark:bg-zinc-800 w-full rounded-full" style="height: 40%;"><div class="bg-primary h-full w-full rounded-full opacity-30"></div></div>
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Fri</p>
+<div class="bg-gray-200 dark:bg-zinc-800 w-full rounded-full" style="height: 60%;"><div class="bg-primary h-full w-full rounded-full opacity-30"></div></div>
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Sat</p>
+<div class="bg-primary w-full rounded-full" style="height: 85%;"></div>
+<p class="text-black dark:text-white text-[13px] font-bold leading-normal tracking-[0.015em]">Sun</p>
+</div>
+</div>
+</section>
+<!-- Section Header -->
+<h3 class="text-black dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Compliance by Category</h3>
+<!-- Progress Bars -->
+<section class="flex flex-col gap-4 p-4">
+<div class="flex flex-col gap-3 rounded-lg p-4 bg-white/5 dark:bg-zinc-900">
+<div class="flex gap-6 justify-between">
+<p class="text-black dark:text-white text-base font-medium leading-normal">Workouts</p>
+<p class="text-black dark:text-white text-sm font-normal leading-normal">75%</p>
+</div>
+<div class="rounded-full bg-gray-200 dark:bg-zinc-800"><div class="h-2 rounded-full bg-primary" style="width: 75%;"></div></div>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">150/200 clients logged</p>
+</div>
+<div class="flex flex-col gap-3 rounded-lg p-4 bg-white/5 dark:bg-zinc-900">
+<div class="flex gap-6 justify-between">
+<p class="text-black dark:text-white text-base font-medium leading-normal">Nutrition</p>
+<p class="text-black dark:text-white text-sm font-normal leading-normal">68%</p>
+</div>
+<div class="rounded-full bg-gray-200 dark:bg-zinc-800"><div class="h-2 rounded-full bg-primary" style="width: 68%;"></div></div>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">136/200 clients tracked</p>
+</div>
+</section>
+<!-- Client Lists -->
+<section class="flex flex-col gap-4 p-4">
+<div class="flex w-full rounded-lg bg-gray-200 dark:bg-zinc-900 p-1">
+<button class="flex-1 rounded-md bg-transparent py-2 text-center text-sm font-semibold text-gray-500 dark:text-gray-400">Top Performers</button>
+<button class="flex-1 rounded-md bg-white dark:bg-zinc-800 py-2 text-center text-sm font-semibold text-black dark:text-white shadow-sm">At-Risk Clients</button>
+</div>
+<ul class="flex flex-col gap-3">
+<li class="flex items-center gap-4 rounded-lg p-3 bg-white/5 dark:bg-zinc-900">
+<img class="size-12 rounded-full object-cover" data-alt="Profile picture of a woman with curly hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCquHfXroAHsNA0cnX4neCAfiml1UB0wt2dN5ZgONva-b8qrAO8LnK2AVacmlgoxAFFp2dE0QZ6qlLp4qjCwWwTrm4CW_ib0NnuLCkpUgnbZ4D4PW5KfXDrZVNt_OzPYtTNWOi8cW-0cTfqZBFrXH8vyhazqqWZRoKrZ-JuNonD_HuLep2hzZkqXGh30Lj7TAd6zHgWwaEKI1caDJonEfj8PyZDnMoKYNE3frVARSCNvHiuqdeUoeMSLhstAR8fPS-VDXAFjxqQ40k"/>
+<div class="flex-1">
+<p class="font-semibold text-black dark:text-white">Jessica Miller</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">Compliance: 32%</p>
+</div>
+<div class="flex items-center justify-center size-10 rounded-full bg-red-500/10 dark:bg-red-500/20">
+<span class="text-xl font-bold text-red-500">32%</span>
+</div>
+</li>
+<li class="flex items-center gap-4 rounded-lg p-3 bg-white/5 dark:bg-zinc-900">
+<img class="size-12 rounded-full object-cover" data-alt="Profile picture of a man with short brown hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFG4cyHtQ9vgDsiVDzyTcS9VJ4Tx82Tfcgl6_q24AdGso0MqYuJ8B8-JrJrrXAuncGb77mguRHcfztaBiZZfzPDZdQpnEShXTo7hIOs5HFh_O3rTaeI1xj91rQuO-lz-9Xwwn-bUww5Eo8Bj-hoHOmq-F27mU2S_qh42PYhNEaBbpgV7xmllarLEXHcLYwhXofugqqtxOa3oL_8Gpz7NC3VFk9kXk0rYSr1muv7VgZ_HVKrF4Bxb729H8O3MSz0eUMJk0g_WwHg4g"/>
+<div class="flex-1">
+<p class="font-semibold text-black dark:text-white">David Chen</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">Compliance: 45%</p>
+</div>
+<div class="flex items-center justify-center size-10 rounded-full bg-red-500/10 dark:bg-red-500/20">
+<span class="text-xl font-bold text-red-500">45%</span>
+</div>
+</li>
+<li class="flex items-center gap-4 rounded-lg p-3 bg-white/5 dark:bg-zinc-900">
+<img class="size-12 rounded-full object-cover" data-alt="Profile picture of a woman with blonde hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjW4CjB-Bm3jM--EvdFBInfznNnd6vlfzQ8-E4bX6sDpElJJM7D-rDNdzZ2-_mNuDRUAYUwT2z-JoNeEdWdfYLw16aR70oiSvQQHQ1QIWrfKSlTWCgfCbbk9XK9x2CziKGjtKyqwQilSWGA2XpNeD-nOdt3tUEmLe9exbFw8kaCQ7zHa21a0VfiDikOMwhKeUH3llFWPmmRIVu7xayxf5A4RN7zvoNMwsMReQAy2SpzYklowb_67cCRpnL82Gx9dH-uNqtDFd5H_g"/>
+<div class="flex-1">
+<p class="font-semibold text-black dark:text-white">Emily Rodriguez</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">Compliance: 51%</p>
+</div>
+<div class="flex items-center justify-center size-10 rounded-full bg-yellow-500/10 dark:bg-yellow-500/20">
+<span class="text-xl font-bold text-yellow-500">51%</span>
+</div>
+</li>
+</ul>
+</section>
+</div>
+</body></html>

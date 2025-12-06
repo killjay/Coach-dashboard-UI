@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trophy Case</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+      }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#112117",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-white/90">arrow_back_ios_new</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Trophy Case</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+<span class="material-symbols-outlined text-white/90">share</span>
+</button>
+</div>
+</div>
+<!-- Chips for Filtering -->
+<div class="flex gap-3 px-4 py-3 overflow-x-auto">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary pl-4 pr-4 cursor-pointer">
+<p class="text-background-dark text-sm font-medium leading-normal">All</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/10 pl-4 pr-4 cursor-pointer">
+<p class="text-white text-sm font-medium leading-normal">PRs</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/10 pl-4 pr-4 cursor-pointer">
+<p class="text-white text-sm font-medium leading-normal">Streaks</p>
+</div>
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/10 pl-4 pr-4 cursor-pointer">
+<p class="text-white text-sm font-medium leading-normal">Badges</p>
+</div>
+</div>
+<!-- Section Header for New Achievements -->
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">New Achievements</h3>
+<!-- Image Grid for New Achievements -->
+<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-4 p-4">
+<div class="flex flex-col gap-3 pb-3 relative">
+<div class="absolute top-2 right-2 bg-primary text-background-dark text-xs font-bold px-2 py-1 rounded-full">NEW</div>
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex items-center justify-center bg-white/5">
+<span class="material-symbols-outlined text-primary" style="font-size: 64px; font-variation-settings: 'wght' 300;">fitness_center</span>
+</div>
+<div>
+<p class="text-white text-base font-medium leading-normal">100 kg</p>
+<p class="text-white/60 text-sm font-normal leading-normal">Bench Press PR</p>
+<p class="text-white/40 text-sm font-normal leading-normal">Dec 1st, 2023</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 pb-3 relative">
+<div class="absolute top-2 right-2 bg-primary text-background-dark text-xs font-bold px-2 py-1 rounded-full">NEW</div>
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex items-center justify-center bg-white/5">
+<span class="material-symbols-outlined text-primary" style="font-size: 64px; font-variation-settings: 'wght' 300;">local_fire_department</span>
+</div>
+<div>
+<p class="text-white text-base font-medium leading-normal">7 Day Streak</p>
+<p class="text-white/60 text-sm font-normal leading-normal">Workout Consistency</p>
+<p class="text-white/40 text-sm font-normal leading-normal">Dec 7th, 2023</p>
+</div>
+</div>
+</div>
+<!-- Section Header for All Personal Records -->
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">All Personal Records</h3>
+<!-- Image Grid for All Personal Records -->
+<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-4 p-4">
+<div class="flex flex-col gap-3 pb-3">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex items-center justify-center bg-white/5" data-alt="Icon of a person doing squats">
+<span class="material-symbols-outlined text-white/80" style="font-size: 64px; font-variation-settings: 'wght' 300;">exercise</span>
+</div>
+<div>
+<p class="text-white text-base font-medium leading-normal">140 kg</p>
+<p class="text-white/60 text-sm font-normal leading-normal">Squat PR</p>
+<p class="text-white/40 text-sm font-normal leading-normal">Nov 25th, 2023</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 pb-3">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex items-center justify-center bg-white/5" data-alt="Icon of a running shoe">
+<span class="material-symbols-outlined text-white/80" style="font-size: 64px; font-variation-settings: 'wght' 300;">sprint</span>
+</div>
+<div>
+<p class="text-white text-base font-medium leading-normal">First 10k Run</p>
+<p class="text-white/60 text-sm font-normal leading-normal">Milestone</p>
+<p class="text-white/40 text-sm font-normal leading-normal">Nov 18th, 2023</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 pb-3">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex items-center justify-center bg-white/5" data-alt="Icon of a deadlift">
+<span class="material-symbols-outlined text-white/80" style="font-size: 64px; font-variation-settings: 'wght' 300;">weight</span>
+</div>
+<div>
+<p class="text-white text-base font-medium leading-normal">180 kg</p>
+<p class="text-white/60 text-sm font-normal leading-normal">Deadlift PR</p>
+<p class="text-white/40 text-sm font-normal leading-normal">Oct 30th, 2023</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 pb-3">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex items-center justify-center bg-white/5" data-alt="Icon of a calendar checkmark">
+<span class="material-symbols-outlined text-white/80" style="font-size: 64px; font-variation-settings: 'wght' 300;">event_available</span>
+</div>
+<div>
+<p class="text-white text-base font-medium leading-normal">50 Workouts</p>
+<p class="text-white/60 text-sm font-normal leading-normal">Completed</p>
+<p class="text-white/40 text-sm font-normal leading-normal">Oct 15th, 2023</p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,164 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to get current user ID
+    function getUserId() {
+      return request.auth.uid;
+    }
+    
+    // Users collection - users can read/write their own data
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && getUserId() == userId;
+    }
+    
+    // Coaches collection - coaches can read/write their own data
+    match /coaches/{coachId} {
+      allow read, write: if isAuthenticated() && getUserId() == coachId;
+    }
+    
+    // Clients collection - clients can read/write their own data, coaches can read their clients' data
+    match /clients/{clientId} {
+      allow read: if isAuthenticated() && (
+        getUserId() == clientId ||
+        exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+        get(/databases/$(database)/documents/clients/$(clientId)).data.coachId == getUserId()
+      );
+      allow write: if isAuthenticated() && getUserId() == clientId;
+    }
+    
+    // Workout templates - coaches can read/write their own templates
+    match /workout_templates/{templateId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+        resource.data.createdBy == getUserId();
+    }
+    
+    // Assigned workouts - clients can read their own, coaches can read/write for their clients
+    match /assigned_workouts/{assignmentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientId == getUserId() ||
+        (exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+         resource.data.coachId == getUserId())
+      );
+      allow write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+        resource.data.coachId == getUserId();
+    }
+    
+    // Workout logs - clients can read/write their own logs, coaches can read their clients' logs
+    match /workout_logs/{logId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientId == getUserId() ||
+        (exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+         exists(/databases/$(database)/documents/clients/$(resource.data.clientId)) &&
+         get(/databases/$(database)/documents/clients/$(resource.data.clientId)).data.coachId == getUserId())
+      );
+      allow write: if isAuthenticated() && resource.data.clientId == getUserId();
+    }
+    
+    // Diet plans - coaches can read/write their own plans
+    match /diet_plans/{planId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+        resource.data.createdBy == getUserId();
+    }
+    
+    // Assigned diets - similar to assigned workouts
+    match /assigned_diets/{assignmentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientId == getUserId() ||
+        (exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+         resource.data.coachId == getUserId())
+      );
+      allow write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+        resource.data.coachId == getUserId();
+    }
+    
+    // Food logs - clients can read/write their own logs, coaches can read their clients' logs
+    match /food_logs/{logId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientId == getUserId() ||
+        (exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+         exists(/databases/$(database)/documents/clients/$(resource.data.clientId)) &&
+         get(/databases/$(database)/documents/clients/$(resource.data.clientId)).data.coachId == getUserId())
+      );
+      allow write: if isAuthenticated() && resource.data.clientId == getUserId();
+    }
+    
+    // Body metrics - clients can read/write their own, coaches can read their clients'
+    match /body_metrics/{metricId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientId == getUserId() ||
+        (exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+         exists(/databases/$(database)/documents/clients/$(resource.data.clientId)) &&
+         get(/databases/$(database)/documents/clients/$(resource.data.clientId)).data.coachId == getUserId())
+      );
+      allow write: if isAuthenticated() && resource.data.clientId == getUserId();
+    }
+    
+    // Water logs - clients can read/write their own
+    match /water_logs/{logId} {
+      allow read, write: if isAuthenticated() && resource.data.clientId == getUserId();
+    }
+    
+    // Sleep logs - clients can read/write their own
+    match /sleep_logs/{logId} {
+      allow read, write: if isAuthenticated() && resource.data.clientId == getUserId();
+    }
+    
+    // Progress photos - clients can read/write their own, coaches can read their clients'
+    match /progress_photos/{photoId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientId == getUserId() ||
+        (exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+         exists(/databases/$(database)/documents/clients/$(resource.data.clientId)) &&
+         get(/databases/$(database)/documents/clients/$(resource.data.clientId)).data.coachId == getUserId())
+      );
+      allow write: if isAuthenticated() && resource.data.clientId == getUserId();
+    }
+    
+    // Personal records - clients can read/write their own
+    match /personal_records/{recordId} {
+      allow read, write: if isAuthenticated() && resource.data.clientId == getUserId();
+    }
+    
+    // Leaderboards - coaches can read/write their own leaderboards
+    match /leaderboards/{coachId} {
+      allow read, write: if isAuthenticated() && getUserId() == coachId;
+    }
+    
+    // Invitations - coaches can read/write their own invitations
+    match /invitations/{inviteId} {
+      allow read: if isAuthenticated() && (
+        resource.data.coachId == getUserId() ||
+        !resource.data.used
+      );
+      allow write: if isAuthenticated() && resource.data.coachId == getUserId();
+      allow update: if isAuthenticated() && 
+        resource.data.coachId == getUserId() ||
+        (!resource.data.used && request.resource.data.used == true);
+    }
+    
+    // Badges - public read, admin write (for now, allow authenticated users to read)
+    match /badges/{badgeId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admins can create badges
+    }
+    
+    // User badges - users can read their own, write their own
+    match /user_badges/{badgeId} {
+      allow read: if isAuthenticated() && resource.data.userId == getUserId();
+      allow write: if isAuthenticated() && resource.data.userId == getUserId();
+    }
+  }
+}
+
+
+
+

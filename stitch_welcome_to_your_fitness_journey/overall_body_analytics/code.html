@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Overall Body Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#112117",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<!-- Top App Bar -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<button class="text-gray-800 dark:text-white flex size-12 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<h1 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Body Analytics</h1>
+<div class="flex size-12 shrink-0 items-center"></div>
+</header>
+<!-- Segmented Buttons for Metric Selection -->
+<div class="flex px-4 py-3">
+<div class="flex h-10 flex-1 items-center justify-center rounded-full bg-black/5 dark:bg-white/5 p-1">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-primary has-[:checked]:shadow-[0_0_4px_rgba(54,226,120,0.5)] has-[:checked]:text-black text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal transition-all duration-300">
+<span class="truncate">Weight</span>
+<input checked="" class="invisible w-0" name="metric-selector" type="radio" value="Weight"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-primary has-[:checked]:shadow-[0_0_4px_rgba(54,226,120,0.5)] has-[:checked]:text-black text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal transition-all duration-300">
+<span class="truncate">BMI</span>
+<input class="invisible w-0" name="metric-selector" type="radio" value="BMI"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-primary has-[:checked]:shadow-[0_0_4px_rgba(54,226,120,0.5)] has-[:checked]:text-black text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal transition-all duration-300">
+<span class="truncate">Body Fat %</span>
+<input class="invisible w-0" name="metric-selector" type="radio" value="Body Fat %"/>
+</label>
+</div>
+</div>
+<!-- Timeframe Filter Chips -->
+<div class="flex gap-2 p-4 pt-1 overflow-x-auto">
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-black/5 dark:bg-white/5 px-4 text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">1M</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary px-4 text-black text-sm font-medium leading-normal">3M</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-black/5 dark:bg-white/5 px-4 text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">6M</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-black/5 dark:bg-white/5 px-4 text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">1Y</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-black/5 dark:bg-white/5 px-4 text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">All</button>
+</div>
+<!-- Interactive Chart -->
+<div class="flex flex-wrap gap-4 px-4 py-2">
+<div class="flex min-w-72 flex-1 flex-col gap-2">
+<p class="text-gray-900 dark:text-white text-base font-medium leading-normal">Body Weight</p>
+<p class="text-gray-900 dark:text-white tracking-light text-[32px] font-bold leading-tight truncate">155.2 lbs</p>
+<div class="flex gap-1">
+<p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Last 3 Months</p>
+<p class="text-red-500 text-base font-medium leading-normal">-5.8 lbs</p>
+</div>
+<div class="flex min-h-[180px] flex-1 flex-col gap-8 py-4">
+<svg fill="none" height="148" preserveaspectratio="none" viewbox="-3 0 478 150" width="100%" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z" fill="url(#chart-gradient)"></path>
+<path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="#36e278" stroke-linecap="round" stroke-width="3"></path>
+<defs>
+<lineargradient gradientunits="userSpaceOnUse" id="chart-gradient" x1="236" x2="236" y1="1" y2="149">
+<stop stop-color="#36e278" stop-opacity="0.3"></stop>
+<stop offset="1" stop-color="#36e278" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="flex justify-around">
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Jan</p>
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Feb</p>
+<p class="text-gray-500 dark:text-gray-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Mar</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Summary Card -->
+<div class="p-4 @container">
+<div class="flex flex-col items-stretch justify-start rounded-xl bg-black/5 dark:bg-white/5 @xl:flex-row @xl:items-start shadow-[0_0_4px_rgba(0,0,0,0.1)]">
+<div class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 p-4">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Summary</p>
+<p class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Current Weight Analysis</p>
+<div class="flex items-start gap-3 justify-between pt-2">
+<div class="flex flex-col gap-1">
+<p class="text-gray-700 dark:text-gray-300 text-base font-normal leading-normal">Your current weight is 155.2 lbs.</p>
+<p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">This reflects a -5.8 lbs change in the last 3 months.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-grow"></div>
+<!-- Floating Action Button -->
+<div class="sticky bottom-0 z-10 p-4 bg-gradient-to-t from-background-light dark:from-background-dark to-transparent">
+<button class="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 px-6 text-center font-bold text-black shadow-lg shadow-primary/30 transition-transform duration-200 ease-in-out hover:scale-[1.02]">
+<span class="material-symbols-outlined">add</span>
+<span>Log New Measurement</span>
+</button>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Client Onboarding: Demographics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#0df259",
+              "background-light": "#f5f8f6",
+              "background-dark": "#102216",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .wheel-picker-container {
+            height: 132px; /* 3 * 44px */
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+        }
+        .wheel-picker-item {
+            height: 44px; /* Matches h-11 */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="flex flex-col h-full flex-grow">
+<!-- TopAppBar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-white/90" style="font-size: 28px;">arrow_back_ios_new</span>
+</div>
+</div>
+<!-- PageIndicators / Progress Bar -->
+<div class="flex w-full flex-row items-center gap-2 px-4 py-3">
+<div class="h-1 flex-1 rounded-full bg-primary"></div>
+<div class="h-1 flex-1 rounded-full bg-white/20"></div>
+<div class="h-1 flex-1 rounded-full bg-white/20"></div>
+<div class="h-1 flex-1 rounded-full bg-white/20"></div>
+</div>
+<!-- HeadlineText -->
+<h1 class="text-white tracking-tight text-[32px] font-bold leading-tight px-4 text-left pb-1 pt-6">Let's start with your date of birth</h1>
+<!-- BodyText -->
+<p class="text-white/70 text-base font-normal leading-normal pb-3 pt-1 px-4">This helps us calculate metrics like your metabolic rate.</p>
+<!-- Spacer -->
+<div class="flex-grow"></div>
+<!-- WheelPicker -->
+<div class="flex px-4 py-8 relative">
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="h-11 w-full rounded-full bg-white/10"></div>
+</div>
+<div class="group flex-1 wheel-picker-container">
+<div class="flex flex-col items-center justify-start pt-11">
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">January</p>
+<p class="text-white text-xl font-bold leading-normal flex wheel-picker-item items-center justify-center truncate text-center">February</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">March</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">April</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">May</p>
+</div>
+</div>
+<div class="group flex-1 wheel-picker-container">
+<div class="flex flex-col items-center justify-start pt-11">
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">14</p>
+<p class="text-white text-xl font-bold leading-normal flex wheel-picker-item items-center justify-center truncate text-center">15</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">16</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">17</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">18</p>
+</div>
+</div>
+<div class="group flex-1 wheel-picker-container">
+<div class="flex flex-col items-center justify-start pt-11">
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">1997</p>
+<p class="text-white text-xl font-bold leading-normal flex wheel-picker-item items-center justify-center truncate text-center">1998</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">1999</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">2000</p>
+<p class="text-white/40 text-lg font-medium leading-normal flex wheel-picker-item items-center justify-center truncate text-center">2001</p>
+</div>
+</div>
+</div>
+<!-- Spacer -->
+<div class="flex-grow"></div>
+<!-- Full-width CTA Button -->
+<div class="p-4 pt-6 pb-8">
+<button class="flex h-14 w-full items-center justify-center rounded-full bg-primary text-background-dark text-lg font-bold leading-normal tracking-wide">Continue</button>
+</div>
+</div>
+</div>
+</body></html>

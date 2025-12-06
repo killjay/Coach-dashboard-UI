@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Food Photo Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#39E079",
+            "background-light": "#f6f8f7",
+            "background-dark": "#122017"
+          },
+          fontFamily: {
+            display: "Lexend"
+          },
+          borderRadius: {
+            DEFAULT: "1rem",
+            lg: "2rem",
+            xl: "3rem",
+            full: "9999px"
+          }
+        }
+      }
+    }
+  </script>
+<style type="text/tailwindcss">
+    body {
+      @apply font-display bg-background-light dark:bg-background-dark text-white antialiased;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col font-display group/design-root">
+<header class="sticky top-0 z-10 flex h-16 items-center justify-between bg-background-dark p-4">
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-white">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-white">Food Photo Log</h1>
+<div class="flex w-10 items-center justify-end"></div>
+</header>
+<main class="flex flex-1 flex-col p-4">
+<div class="mb-6 flex w-full justify-center">
+<div class="flex items-center gap-2 rounded-full bg-[#1A2D21] p-1">
+<button class="rounded-full px-4 py-2 text-sm font-semibold text-white">Breakfast</button>
+<button class="rounded-full bg-primary px-4 py-2 text-sm font-bold text-background-dark">Lunch</button>
+<button class="rounded-full px-4 py-2 text-sm font-semibold text-white">Dinner</button>
+<button class="rounded-full px-4 py-2 text-sm font-semibold text-white">Snack</button>
+</div>
+</div>
+<div class="flex flex-1 flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#316843] bg-[#1A2D21]/50 p-6">
+<div class="flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-5xl text-primary" style="font-variation-settings: 'FILL' 1;">add_a_photo</span>
+<p class="mt-4 text-base font-medium text-white">Tap to take a photo</p>
+<p class="mt-1 text-sm text-[#90cba4]">or select one from your camera roll</p>
+</div>
+</div>
+</main>
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-background-dark to-transparent p-4 pb-6 pt-8">
+<div class="flex items-center gap-4">
+<button class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary">
+<span class="material-symbols-outlined text-4xl text-primary">photo_library</span>
+</button>
+<button class="flex h-16 flex-1 items-center justify-center rounded-full bg-primary text-background-dark">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'wght' 600;">photo_camera</span>
+</button>
+</div>
+</footer>
+</div>
+
+</body></html>

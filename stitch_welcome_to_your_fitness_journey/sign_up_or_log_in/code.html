@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up or Log In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0df259",
+            "background-light": "#f5f8f6",
+            "background-dark": "#102216",
+          },
+          fontFamily: {
+            "display": ["Lexend"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display group/design-root overflow-x-hidden">
+<div class="absolute inset-0 h-full w-full">
+<div class="h-full w-full bg-center bg-no-repeat bg-cover" data-alt="Athlete in motion against a dark, moody background, conveying energy and focus." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDuQncb-f3FUy0PLAGggqIQeetPhaKoEE1dTYmjCPycj1QezGXykKLXp8qfXU0cIDTu6LP5lqFHDaIj5hXuilTbkG8ayEmqcjefr7W9nMrbQA8CG1brsIeylbDBhK3nSiLfpMzcL3AVGHMJQOy-dJgWGVm_8qXaRubmOPZPHn852q65V2LmbH6K_Mbly_nF7UG5RDxSMf7Y4IGWbkVRnsjwVTFDtRhqR3Kkh0DPnXVltoey_9W-tGdq9tkyIjG40LWRKn66UePLi9M");'>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/80 to-background-dark/30"></div>
+</div>
+</div>
+<div class="relative flex flex-col h-full min-h-screen justify-end px-4">
+<div class="flex flex-col gap-6 pb-6">
+<h1 class="text-white tracking-light text-[32px] font-bold leading-tight text-center">Get Started</h1>
+<div class="flex py-3">
+<div class="flex h-12 flex-1 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm p-1 border border-white/10">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white/10 has-[:checked]:shadow-inner text-white text-sm font-medium leading-normal transition-colors">
+<span class="truncate">Sign Up</span>
+<input checked="" class="invisible w-0" name="auth-toggle" type="radio" value="Sign Up"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white/10 has-[:checked]:shadow-inner text-white/70 has-[:checked]:text-white text-sm font-medium leading-normal transition-colors">
+<span class="truncate">Log In</span>
+<input class="invisible w-0" name="auth-toggle" type="radio" value="Log In"/>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-white text-sm font-medium leading-normal pb-2">Full Name</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-white/10 bg-black/20 h-14 placeholder:text-white/40 p-4 text-base font-normal leading-normal backdrop-blur-sm" placeholder="Enter your full name" type="text" value=""/>
+</label>
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-white text-sm font-medium leading-normal pb-2">Email</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-white/10 bg-black/20 h-14 placeholder:text-white/40 p-4 text-base font-normal leading-normal backdrop-blur-sm" placeholder="Enter your email" type="email" value=""/>
+</label>
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-white text-sm font-medium leading-normal pb-2">Password</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-white/10 bg-black/20 h-14 placeholder:text-white/40 p-4 text-base font-normal leading-normal backdrop-blur-sm" placeholder="Enter your password" type="password" value=""/>
+</label>
+</div>
+<button class="flex items-center justify-center rounded-full bg-primary h-14 text-background-dark text-base font-bold leading-normal mt-2">Create Account</button>
+<a class="text-white/60 text-center text-sm font-medium" href="#">Forgot Password?</a>
+<div class="flex items-center gap-4 py-2">
+<div class="h-px flex-1 bg-white/20"></div>
+<p class="text-white/60 text-sm">Or continue with</p>
+<div class="h-px flex-1 bg-white/20"></div>
+</div>
+<div class="flex items-center justify-center gap-4">
+<button class="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-black/20 backdrop-blur-sm">
+<img alt="Google logo" class="h-6 w-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjBS4fteheq6lFYM2k9uXoGz9Dlclzn1-3CFdacOLwb4zp0y749XyyPAiYK3Kd9_8vmbtVXXUgDLA32CAmtJA25DfpvkpTDDrc_xfd-L095c2o5zDLVaq6Bi6H5VtvLRqaMWzxmTDpqaZnnu6xGtrGvbtQeBuFPnqIZpSKBE0YZpSpm8NfVtc-ZDbFCqIstvseQuCB-NpLz9lolsQGVu2MVafZOtwawGI2qjLs8s21AhUwLb_pyrEggK4vNH_I7PHsJeNqVK2ZeoY"/>
+</button>
+<button class="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-black/20 backdrop-blur-sm text-white">
+<img alt="Apple logo" class="h-7 w-7 filter invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAONOzrZ_x-zoVvzHg7WEH6Yv0EcqCGcp3JJDKrsJPId7SjOwW4HzMHpr2q6b6vpeNpcB6k6ENtGvAZzp1fhZ3dcSYCvSUvzs8iWsxkNWu_tHplfjxHNi8ssucwmhs_I9xBhNN5kssVqtkaivguocQ_cl492zi-kBrmR7c67QG2NZL3ARIDL7y561jex_N4yvYpOBIygDaSi4xvdYBIznfUf25T0HbUywVRPx8FVI4lNuUwJOHppPr7MAVmeDM4hfdfHMUFhi7WykY"/>
+</button>
+<button class="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-black/20 backdrop-blur-sm text-white">
+<img alt="Facebook logo" class="h-7 w-7" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAgzpWwtUh-pGlpwHRmDV9BarvaU5Yi5lwK7JlMHldP95Hc4gco_zFAeFMTpN8BLC8qxk8Pir90ZNCtjYj7Zuwz02HUT9_taL-cxjV4S3XaQhOr4UQCr9zzcWc5raOIaQfwN9khb-9EA8OsB-wqk8oL1CdF6RGv5LviQFk1MDwWofzwVLqTryh31e65AHmhp8wjpIi55qVRMvrrguzkr7Qk442gKVz3NsoQla6UHnhLFWZEQ9J7kl6QtOYWfGu0dkFbRkvhuJkM8k"/>
+</button>
+</div>
+<p class="text-white/50 text-xs text-center leading-relaxed pt-4 pb-2">By continuing, you agree to our <a class="underline" href="#">Terms of Service</a> and <a class="underline" href="#">Privacy Policy</a>.</p>
+</div>
+</div>
+</div>
+</body></html>

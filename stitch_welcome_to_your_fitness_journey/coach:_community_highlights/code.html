@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Coach: Community Highlights</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+      }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e278",
+              "background-light": "#f6f8f7",
+              "background-dark": "#111714",
+              "card-light": "#ffffff",
+              "card-dark": "#1c2620",
+              "text-light-primary": "#1f2937",
+              "text-dark-primary": "#f9fafb",
+              "text-light-secondary": "#6b7280",
+              "text-dark-secondary": "#9eb7a8",
+              "button-light": "#eefdf4",
+              "button-dark": "#29382f",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 sticky top-0 z-10 border-b border-gray-200/10 dark:border-gray-800/50">
+<button class="text-text-light-primary dark:text-text-dark-primary flex size-10 shrink-0 items-center justify-center rounded-full">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+</button>
+<h1 class="text-text-light-primary dark:text-text-dark-primary text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Community Highlights</h1>
+<div class="size-10 shrink-0"></div>
+</div>
+<!-- Segmented Buttons -->
+<div class="flex px-4 py-3">
+<div class="flex h-11 flex-1 items-center justify-center rounded-full bg-button-light dark:bg-button-dark p-1">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-primary has-[:checked]:shadow-md has-[:checked]:text-black text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal transition-colors">
+<span class="truncate">This Week</span>
+<input checked="" class="invisible absolute w-0" name="timeframe-selector" type="radio" value="This Week"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-primary has-[:checked]:shadow-md has-[:checked]:text-black text-text-light-secondary dark:text-text-dark-secondary text-sm font-medium leading-normal transition-colors">
+<span class="truncate">Last Week</span>
+<input class="invisible absolute w-0" name="timeframe-selector" type="radio" value="Last Week"/>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-4 p-4 pt-2">
+<!-- Card 1 -->
+<div class="flex flex-col gap-4 rounded-lg bg-card-light dark:bg-card-dark p-4 shadow-sm">
+<div class="flex items-center gap-4">
+<div class="relative size-16 shrink-0">
+<img class="size-full rounded-full object-cover" data-alt="Profile picture of Eleanor Pena" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-GZFd6_zhUQYODV2AU12O-0I0JYD2jnKGC7ZE_1SAmbTBodnJApjSeZGMqYPJneGvrdPCR64cE8Jfua2uE490Pr_-gFI_2yhC1UzAxVKt06FASlRgzQ1kH3EM70yrtsERjNLVsO1C_KYmx-Ay3D-XfzUCBKfYc5kid-5lvwPQ8Q06JQyKeD2ckUF32LkHCLdIw4xR6poCocOpQCINsTIbUf3Fyaf1juC1yE_l5iU0He5LGIlutnZ6C99x_0Fqi2w80o6XN0hp8rg"/>
+<div class="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full border-2 border-card-light dark:border-card-dark bg-yellow-400 text-yellow-900">
+<span class="font-bold text-sm">1</span>
+</div>
+</div>
+<div class="flex flex-col gap-0.5">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-bold leading-tight">Eleanor Pena</p>
+<p class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal">Highest Progress Score</p>
+</div>
+<div class="ml-auto flex flex-col items-end">
+<p class="text-primary text-2xl font-bold">98%</p>
+</div>
+</div>
+<button class="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-4 flex-row-reverse bg-button-light dark:bg-button-dark text-text-light-primary dark:text-text-dark-primary gap-2 text-sm font-medium leading-normal">
+<span class="material-symbols-outlined text-xl">chat_bubble</span>
+<span class="truncate">Congratulate</span>
+</button>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col gap-4 rounded-lg bg-card-light dark:bg-card-dark p-4 shadow-sm">
+<div class="flex items-center gap-4">
+<div class="relative size-16 shrink-0">
+<img class="size-full rounded-full object-cover" data-alt="Profile picture of Wade Warren" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjzdwTLMWZwkwslFoPxJSSpNlxbTajKw0ammeXkgSuSEwm3LzxJLOazldR3joh2Si4caJBd3Uqo3IrPqeF03oqt5bsK6TzNTCIC5tGVP74BWS1_zwsIzGDYT9zbN8LVDBxMRaIAgOf7UksyJw01Fi-C2POoeE45DfbA8_bMEsipzjDFAxE21KqSARGNA7Caz17vnDE-hn9aAAaDihbiiBNGwchla_C_otUrljqI0KX8aBljFPJUvF3jvoHMLelT9kUE-TaW-Bb99k"/>
+<div class="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full border-2 border-card-light dark:border-card-dark bg-gray-300 text-gray-800">
+<span class="font-bold text-sm">2</span>
+</div>
+</div>
+<div class="flex flex-col gap-0.5">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-bold leading-tight">Wade Warren</p>
+<p class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal">Most Consistent</p>
+</div>
+<div class="ml-auto flex flex-col items-end">
+<p class="text-primary text-2xl font-bold">95%</p>
+</div>
+</div>
+<button class="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-4 flex-row-reverse bg-button-light dark:bg-button-dark text-text-light-primary dark:text-text-dark-primary gap-2 text-sm font-medium leading-normal">
+<span class="material-symbols-outlined text-xl">chat_bubble</span>
+<span class="truncate">Congratulate</span>
+</button>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col gap-4 rounded-lg bg-card-light dark:bg-card-dark p-4 shadow-sm">
+<div class="flex items-center gap-4">
+<div class="relative size-16 shrink-0">
+<img class="size-full rounded-full object-cover" data-alt="Profile picture of Cameron Williamson" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhDLDlaS3PseR6c_SjlcJ832FcemSxVvFGLH1QpBE3jfwpgupAoc3M0aCgmaYtzd35sXf5Pinsa_57cSF9dJ9lmRUN_WrcSYQyI6SZLQIGN3ZXU2HJO_4MhvFho0e5TMBi8tdMW-qF8OVuPh12z-D2E_tmaVU3okPaA9AZBaAmCAbJchK8CGlkMXfqmcLqB1jmVDPXbHiL2opU9C9X6HpiTTGu0lGqu_NcHWy5Dl8rL52D7Jwktq5KL_i2W56qlDV18rJztn-Pw0s"/>
+<div class="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full border-2 border-card-light dark:border-card-dark bg-orange-400 text-orange-900">
+<span class="font-bold text-sm">3</span>
+</div>
+</div>
+<div class="flex flex-col gap-0.5">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-bold leading-tight">Cameron Williamson</p>
+<p class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal">New Personal Best</p>
+</div>
+<div class="ml-auto flex flex-col items-end">
+<p class="text-primary text-2xl font-bold">92%</p>
+</div>
+</div>
+<button class="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-4 flex-row-reverse bg-button-light dark:bg-button-dark text-text-light-primary dark:text-text-dark-primary gap-2 text-sm font-medium leading-normal">
+<span class="material-symbols-outlined text-xl">chat_bubble</span>
+<span class="truncate">Congratulate</span>
+</button>
+</div>
+<!-- See All Link -->
+<div class="flex justify-center py-4">
+<button class="text-primary font-medium text-sm">See Full Leaderboard</button>
+</div>
+</div>
+</div>
+</body></html>

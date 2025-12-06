@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Client Onboarding: Health Screening</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+      }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#0df259",
+              "background-light": "#f5f8f6",
+              "background-dark": "#102216",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-dark">
+<!-- TopAppBar -->
+<div class="flex items-center bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-white text-3xl">arrow_back_ios_new</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Health Screening</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+<span class="material-symbols-outlined text-white text-3xl">info</span>
+</button>
+</div>
+</div>
+<div class="flex-1 px-4">
+<!-- ProgressBar -->
+<div class="flex flex-col gap-3 py-4">
+<div class="flex gap-6 justify-between">
+<p class="text-white text-base font-medium leading-normal">Step 2 of 5</p>
+</div>
+<div class="rounded-full bg-white/10 h-2">
+<div class="h-2 rounded-full bg-primary" style="width: 40%;"></div>
+</div>
+</div>
+<!-- BodyText -->
+<p class="text-white/80 text-base font-normal leading-normal pb-3 pt-4">
+                This information helps your coach create a safe and effective plan tailored to you. Your data is stored securely.
+            </p>
+<!-- SectionHeader -->
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 pt-6">Please select any pre-existing conditions:</h3>
+<div class="flex flex-col gap-2">
+<!-- ListItem: PCOS -->
+<div class="flex items-center gap-4 bg-background-dark min-h-[72px] py-2 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-white flex items-center justify-center rounded-lg bg-[#22492f] shrink-0 size-12">
+<span class="material-symbols-outlined">female</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">PCOS</p>
+<p class="text-[#90cba4] text-sm font-normal leading-normal line-clamp-2">Polycystic Ovary Syndrome</p>
+</div>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#22492f] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform transform" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- ListItem: Diabetes -->
+<div class="flex items-center gap-4 bg-background-dark min-h-[72px] py-2 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-white flex items-center justify-center rounded-lg bg-[#22492f] shrink-0 size-12">
+<span class="material-symbols-outlined">blood_pressure</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Diabetes</p>
+<p class="text-[#90cba4] text-sm font-normal leading-normal line-clamp-2">Type 1 or 2</p>
+</div>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#22492f] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform transform" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input checked="" class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- ListItem: Thyroid Issues -->
+<div class="flex items-center gap-4 bg-background-dark min-h-[72px] py-2 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-white flex items-center justify-center rounded-lg bg-[#22492f] shrink-0 size-12">
+<span class="material-symbols-outlined">endocrinology</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Thyroid Issues</p>
+<p class="text-[#90cba4] text-sm font-normal leading-normal line-clamp-2">Hyper or Hypothyroidism</p>
+</div>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#22492f] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform transform" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- ListItem: Hypertension -->
+<div class="flex items-center gap-4 bg-background-dark min-h-[72px] py-2 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-white flex items-center justify-center rounded-lg bg-[#22492f] shrink-0 size-12">
+<span class="material-symbols-outlined">monitor_heart</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Hypertension</p>
+<p class="text-[#90cba4] text-sm font-normal leading-normal line-clamp-2">High Blood Pressure</p>
+</div>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#22492f] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white transition-transform transform" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+<!-- Other Conditions Section -->
+<div class="pt-8 pb-4">
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-3">Other Conditions or Injuries</h3>
+<textarea class="w-full rounded-lg border-0 bg-[#22492f] p-4 text-white placeholder:text-white/50 focus:ring-2 focus:ring-primary" placeholder="e.g., Past knee surgery, allergies..." rows="4"></textarea>
+</div>
+</div>
+<!-- CTA Button -->
+<div class="sticky bottom-0 bg-background-dark p-4 pt-2">
+<button class="w-full rounded-full bg-primary py-4 text-center text-lg font-bold text-background-dark">Continue</button>
+</div>
+</div>
+</body></html>
