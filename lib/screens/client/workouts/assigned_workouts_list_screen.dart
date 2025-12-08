@@ -5,6 +5,7 @@ import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
 import 'workout_logging_screen.dart';
+import '../../shared/exercise_library_screen.dart';
 
 class AssignedWorkoutsListScreen extends StatefulWidget {
   const AssignedWorkoutsListScreen({super.key});
@@ -257,7 +258,11 @@ class _AssignedWorkoutsListScreenState extends State<AssignedWorkoutsListScreen>
                     title: const Text('Browse Exercise Library', style: TextStyle(color: Colors.white)),
                     onTap: () {
                       Navigator.pop(context);
-                      // Navigate to exercise library
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ExerciseLibraryScreen(),
+                        ),
+                      );
                     },
                   ),
                   ListTile(

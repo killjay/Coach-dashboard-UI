@@ -280,7 +280,7 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> {
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => ClientProfileViewScreen(clientName: client.name),
+                                  builder: (_) => ClientProfileViewScreen(clientId: client.name),
                                 ),
                               );
                             },

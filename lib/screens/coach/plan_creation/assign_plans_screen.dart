@@ -6,7 +6,12 @@ import '../../../widgets/common/app_card.dart';
 import '../../../widgets/common/primary_button.dart';
 
 class AssignPlansScreen extends StatefulWidget {
-  const AssignPlansScreen({super.key});
+  final String? preSelectedClientId;
+
+  const AssignPlansScreen({
+    super.key,
+    this.preSelectedClientId,
+  });
 
   @override
   State<AssignPlansScreen> createState() => _AssignPlansScreenState();
@@ -18,13 +23,29 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
   String? _selectedWorkoutTemplate;
   String? _selectedDietPlan;
 
-  final List<ClientData> _allClients = [
-    ClientData(name: 'Alex Morgan', isSelected: false),
-    ClientData(name: 'James Anderson', isSelected: false),
-    ClientData(name: 'Serena Williams', isSelected: false),
-    ClientData(name: 'Michael Chen', isSelected: false),
-    ClientData(name: 'Emma Thompson', isSelected: false),
-  ];
+  late List<ClientData> _allClients;
+
+  @override
+  void initState() {
+    super.initState();
+    _allClients = [
+      ClientData(name: 'Alex Morgan', isSelected: false),
+      ClientData(name: 'James Anderson', isSelected: false),
+      ClientData(name: 'Serena Williams', isSelected: false),
+      ClientData(name: 'Michael Chen', isSelected: false),
+      ClientData(name: 'Emma Thompson', isSelected: false),
+    ];
+    
+    // Pre-select client if provided
+    if (widget.preSelectedClientId != null) {
+      for (var client in _allClients) {
+        if (client.name == widget.preSelectedClientId) {
+          client.isSelected = true;
+          break;
+        }
+      }
+    }
+  }
 
   List<ClientData> get _filteredClients {
     if (_searchController.text.isEmpty) {

@@ -6,12 +6,12 @@ import '../../../widgets/common/app_card.dart';
 
 class ClientTrendAnalysisScreen extends StatefulWidget {
   final String clientName;
-  final String? clientId;
+  final String clientId;
 
   const ClientTrendAnalysisScreen({
     super.key,
     this.clientName = 'Jane Doe',
-    this.clientId,
+    required this.clientId,
   });
 
   @override

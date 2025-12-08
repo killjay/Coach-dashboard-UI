@@ -5,7 +5,15 @@ import '../../../widgets/common/progress_ring.dart';
 import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_card.dart';
 import '../workouts/workout_logging_screen.dart';
+import '../workouts/assigned_workouts_list_screen.dart';
 import '../tracking/water_tracker_screen.dart';
+import '../tracking/steps_logging_screen.dart';
+import '../nutrition/daily_macro_goals_screen.dart';
+import '../analytics/overall_body_analytics_screen.dart';
+import '../analytics/personal_records_screen.dart';
+import '../community/community_leaderboards_screen.dart';
+import '../community/personal_badges_screen.dart';
+import '../../shared/general_settings_screen.dart';
 
 class TodayViewScreen extends StatelessWidget {
   const TodayViewScreen({super.key});
@@ -62,17 +70,10 @@ class TodayViewScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Profile Picture - Tappable
+                  // Profile Picture - Tappable (shows menu with options)
                   GestureDetector(
                     onTap: () {
-                      // Navigate to Profile screen
-                      // TODO: Implement Profile screen navigation
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Profile screen coming soon'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
+                      _showProfileMenu(context);
                     },
                     child: Container(
                       width: 48,
@@ -165,16 +166,14 @@ class TodayViewScreen extends StatelessWidget {
                       actionButton: IconButton(
                         icon: Icon(
                           Icons.add_circle,
-                          color: Colors.white,
+                          color: AppColors.primary,
                           size: 28,
                         ),
                         onPressed: () {
-                          // Navigate to Manual Food Logging screen
-                          // TODO: Implement Food Logging screen navigation
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Food logging screen coming soon'),
-                              duration: Duration(seconds: 1),
+                          // Navigate to Daily Macro/Calorie Goals screen
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const DailyMacroGoalsScreen(),
                             ),
                           );
                         },
@@ -189,7 +188,7 @@ class TodayViewScreen extends StatelessWidget {
                       actionButton: IconButton(
                         icon: Icon(
                           Icons.add_circle,
-                          color: Colors.white,
+                          color: AppColors.primary,
                           size: 28,
                         ),
                         onPressed: () {
@@ -210,11 +209,18 @@ class TodayViewScreen extends StatelessWidget {
                       subtitle: '8,204 / 10,000',
                       actionButton: IconButton(
                         icon: Icon(
-                          Icons.check_circle,
+                          Icons.add_circle,
                           color: AppColors.primary,
                           size: 28,
                         ),
-                        onPressed: null, // Non-interactive as steps are auto-tracked
+                        onPressed: () {
+                          // Navigate to Steps Logging screen
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const StepsLoggingScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -242,34 +248,24 @@ class TodayViewScreen extends StatelessWidget {
                     children: [
                       _buildNavItem(context, Icons.home, 'Today', isActive: true),
                       _buildNavItem(context, Icons.event_note, 'Plan', onTap: () {
-                        // Navigate to Assigned Workouts List or Plans Overview
-                        // TODO: Implement Plan screen navigation
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Plan screen coming soon'),
-                            duration: Duration(seconds: 1),
+                        // Navigate to Assigned Workouts List
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AssignedWorkoutsListScreen(),
                           ),
                         );
                       }),
-                      _buildNavItem(context, Icons.chat, 'Chat', onTap: () {
-                        // Navigate to Coach-Client Chat screen
-                        // TODO: Implement Chat screen navigation
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Chat screen coming soon'),
-                            duration: Duration(seconds: 1),
+                      _buildNavItem(context, Icons.analytics, 'Analytics', onTap: () {
+                        // Navigate to Overall Body Analytics
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const OverallBodyAnalyticsScreen(),
                           ),
                         );
                       }),
                       _buildNavItem(context, Icons.person, 'Profile', onTap: () {
-                        // Navigate to Profile screen
-                        // TODO: Implement Profile screen navigation
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Profile screen coming soon'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
+                        // Show profile menu with options
+                        _showProfileMenu(context);
                       }),
                     ],
                   ),
@@ -363,6 +359,84 @@ class TodayViewScreen extends StatelessWidget {
                 ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showProfileMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.cardDark,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.trending_up, color: AppColors.primary),
+              title: const Text('Body Analytics', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const OverallBodyAnalyticsScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.emoji_events, color: AppColors.primary),
+              title: const Text('Trophy Case', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PersonalRecordsScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.people, color: AppColors.primary),
+              title: const Text('Leaderboards', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const CommunityLeaderboardsScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.workspace_premium, color: AppColors.primary),
+              title: const Text('Badges', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PersonalBadgesScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings, color: AppColors.primary),
+              title: const Text('Settings', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const GeneralSettingsScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -19,7 +19,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.backgroundDark,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -31,7 +31,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
               Text(
                 'Select Your Role',
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      color: AppColors.textZinc900,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                 textAlign: TextAlign.center,
@@ -40,7 +40,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
               Text(
                 'Choose how you want to use the app',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.textZinc500,
+                      color: AppColors.textSecondaryDark,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -132,19 +132,19 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.cardDark,
           borderRadius: BorderRadius.circular(AppTheme.radiusDefault),
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
-                : AppColors.primary.withOpacity(0.2),
+                : AppColors.borderWhite10,
             width: isSelected ? 3 : 2,
           ),
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? AppColors.primary.withOpacity(0.2)
-                  : Colors.black.withOpacity(0.05),
+                  ? AppColors.primary.withOpacity(0.3)
+                  : Colors.black.withOpacity(0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -173,7 +173,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                   Text(
                     title,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: AppColors.textZinc900,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
@@ -181,7 +181,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textZinc500,
+                          color: AppColors.textSecondaryDark,
                         ),
                   ),
                 ],

@@ -6,10 +6,12 @@ import '../../../widgets/common/app_card.dart';
 
 class ProgressPhotosScreen extends StatefulWidget {
   final String clientName;
+  final String clientId;
 
   const ProgressPhotosScreen({
     super.key,
     this.clientName = 'Jessica Smith',
+    required this.clientId,
   });
 
   @override
