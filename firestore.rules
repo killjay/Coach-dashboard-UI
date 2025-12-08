@@ -23,12 +23,19 @@ service cloud.firestore {
     
     // Clients collection - clients can read/write their own data, coaches can read their clients' data
     match /clients/{clientId} {
-      allow read: if isAuthenticated() && (
-        getUserId() == clientId ||
+      // Allow clients to read/write their own data
+      allow read, write: if isAuthenticated() && getUserId() == clientId;
+      
+      // Allow coaches to read clients where coachId matches
+      // For queries, resource might be null, so we check if coach document exists
+      // and verify the client's coachId matches (if resource exists)
+      allow read: if isAuthenticated() && 
         exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
-        get(/databases/$(database)/documents/clients/$(clientId)).data.coachId == getUserId()
-      );
-      allow write: if isAuthenticated() && getUserId() == clientId;
+        (resource == null || resource.data.coachId == getUserId());
+      
+      // Allow coaches to create client documents (for initial setup)
+      allow create: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/coaches/$(getUserId()));
     }
     
     // Workout templates - coaches can read/write their own templates

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_icon_button.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../providers/user_provider.dart';
+import '../../../models/health_screening_model.dart';
 import 'lifestyle_goals_screen.dart';
 
 class HealthScreeningScreen extends StatefulWidget {
@@ -188,12 +192,15 @@ class _HealthScreeningScreenState extends State<HealthScreeningScreen> {
                 width: double.infinity,
                 child: PrimaryButton(
                   text: 'Continue',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const LifestyleGoalsScreen(),
-                      ),
-                    );
+                  onPressed: () async {
+                    await _saveHealthData();
+                    if (mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const LifestyleGoalsScreen(),
+                        ),
+                      );
+                    }
                   },
                 ),
               ),
@@ -274,6 +281,50 @@ class _HealthScreeningScreenState extends State<HealthScreeningScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveHealthData() async {
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final userProvider = context.read<UserProvider>();
+      final userId = authProvider.user?.uid;
+
+      if (userId == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User not authenticated. Please sign in again.'),
+            ),
+          );
+        }
+        return;
+      }
+
+      final healthData = HealthScreeningModel(
+        pcos: _conditions['PCOS'] ?? false,
+        diabetes: _conditions['Diabetes'] ?? false,
+        thyroidIssues: _conditions['Thyroid Issues'] ?? false,
+        hypertension: _conditions['Hypertension'] ?? false,
+        otherConditions: _otherConditionsController.text.trim().isEmpty
+            ? null
+            : _otherConditionsController.text.trim(),
+      );
+
+      await userProvider.updateClientOnboarding(
+        clientId: userId,
+        onboardingCompleted: false,
+        healthData: healthData.toJson(),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving health data: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 

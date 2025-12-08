@@ -162,6 +162,11 @@ class UserService {
       return Failure('Failed to update onboarding: $e');
     }
   }
+
+  /// Set a document (create or overwrite) - helper method
+  Future<void> setDocument(String path, Map<String, dynamic> data) async {
+    await _firestoreService.setDocument(path, data);
+  }
 }
 
 

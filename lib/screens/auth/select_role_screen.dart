@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common/primary_button.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/user_provider.dart';
+import '../../services/invitation_service.dart';
+import '../../services/user_service.dart';
+import '../../utils/deep_link_handler.dart';
+import '../../models/user_model.dart';
+import '../../models/client_model.dart';
+import '../../models/coach_model.dart';
 import '../client/onboarding/demographics_screen.dart';
+import '../client/dashboard/today_view_screen.dart';
 import '../coach/client_management/client_list_view_screen.dart';
 import 'sign_up_login_screen.dart';
 
 class SelectRoleScreen extends StatefulWidget {
-  const SelectRoleScreen({super.key});
+  final String? invitationCode;
+  
+  const SelectRoleScreen({
+    super.key,
+    this.invitationCode,
+  });
 
   @override
   State<SelectRoleScreen> createState() => _SelectRoleScreenState();
@@ -15,6 +30,18 @@ class SelectRoleScreen extends StatefulWidget {
 
 class _SelectRoleScreenState extends State<SelectRoleScreen> {
   String? _selectedRole; // 'client' or 'coach'
+  bool _isProcessing = false;
+  final InvitationService _invitationService = InvitationService();
+  final UserService _userService = UserService();
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-select client role if invitation code exists
+    if (widget.invitationCode != null) {
+      _selectedRole = 'client';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,26 +100,45 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                 },
               ),
               const Spacer(),
+              // Invitation message
+              if (widget.invitationCode != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusDefault),
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.mail_outline,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'You\'ve been invited by a coach',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               // Continue Button
               PrimaryButton(
-                text: 'Continue',
-                onPressed: _selectedRole == null
+                text: _isProcessing ? 'Processing...' : 'Continue',
+                onPressed: _selectedRole == null || _isProcessing
                     ? null
-                    : () {
-                        if (_selectedRole == 'client') {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const DemographicsScreen(),
-                            ),
-                          );
-                        } else if (_selectedRole == 'coach') {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (_) => const ClientListViewScreen(),
-                            ),
-                          );
-                        }
-                      },
+                    : _handleContinue,
               ),
               const SizedBox(height: 16),
               // Sign in Link
@@ -197,5 +243,209 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleContinue() async {
+    if (_selectedRole == null) return;
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final userProvider = context.read<UserProvider>();
+      final userId = authProvider.user?.uid;
+
+      if (userId == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User not authenticated. Please sign in again.'),
+            ),
+          );
+        }
+        return;
+      }
+
+      // Get user email and name from auth
+      final email = authProvider.user?.email ?? '';
+      final name = authProvider.user?.displayName ?? email.split('@')[0];
+
+      if (_selectedRole == 'client') {
+        // Check if client document already exists
+        final existingClient = await _userService.getClient(userId);
+        
+        if (existingClient.isSuccess && existingClient.dataOrNull != null) {
+          // Client already exists, check onboarding status
+          final client = existingClient.dataOrNull!;
+          
+          // Accept invitation if code exists and client not linked
+          if (widget.invitationCode != null && client.coachId == null) {
+            await _acceptInvitation(widget.invitationCode!, userId);
+          }
+          
+          // Load client data
+          await userProvider.loadClient(userId);
+          
+          if (mounted) {
+            if (client.onboardingCompleted) {
+              // Navigate to dashboard
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => const TodayViewScreen(),
+                ),
+              );
+            } else {
+              // Navigate to onboarding
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => const DemographicsScreen(),
+                ),
+              );
+            }
+          }
+        } else {
+          // Create user and client documents
+          final userModel = UserModel(
+            id: userId,
+            email: email,
+            name: name,
+            role: UserRole.client,
+            createdAt: DateTime.now(),
+          );
+
+          final clientModel = ClientModel(
+            id: userId,
+            email: email,
+            name: name,
+            createdAt: DateTime.now(),
+            onboardingCompleted: false,
+          );
+
+          // Create user document
+          await _userService.createUser(userModel);
+          
+          // Create client document
+          await _userService.setDocument('clients/$userId', clientModel.toJson());
+
+          // Accept invitation if code exists
+          if (widget.invitationCode != null) {
+            await _acceptInvitation(widget.invitationCode!, userId);
+          }
+
+          // Clear invitation code
+          await DeepLinkHandler.clearInvitationCode();
+
+          // Load client data
+          await userProvider.loadClient(userId);
+
+          if (mounted) {
+            // Navigate to onboarding
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const DemographicsScreen(),
+              ),
+            );
+          }
+        }
+      } else if (_selectedRole == 'coach') {
+        // Check if coach document already exists
+        final existingCoach = await _userService.getCoach(userId);
+        
+        if (existingCoach.isSuccess && existingCoach.dataOrNull != null) {
+          // Coach already exists, navigate to dashboard
+          await userProvider.loadCoach(userId);
+          
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const ClientListViewScreen(),
+              ),
+            );
+          }
+        } else {
+          // Create user and coach documents
+          final userModel = UserModel(
+            id: userId,
+            email: email,
+            name: name,
+            role: UserRole.coach,
+            createdAt: DateTime.now(),
+          );
+
+          final coachModel = CoachModel(
+            id: userId,
+            email: email,
+            name: name,
+            createdAt: DateTime.now(),
+            clientIds: [],
+          );
+
+          // Create user document
+          await _userService.createUser(userModel);
+          
+          // Create coach document
+          await _userService.setDocument('coaches/$userId', coachModel.toJson());
+
+          // Verify coach document was created (retry up to 3 times)
+          bool coachExists = false;
+          for (int i = 0; i < 3; i++) {
+            final coachResult = await _userService.getCoach(userId);
+            if (coachResult.isSuccess && coachResult.dataOrNull != null) {
+              coachExists = true;
+              break;
+            }
+            await Future.delayed(const Duration(milliseconds: 300));
+          }
+
+          if (!coachExists) {
+            throw Exception('Failed to create coach document');
+          }
+
+          // Load coach data
+          await userProvider.loadCoach(userId);
+
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const ClientListViewScreen(),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _acceptInvitation(String code, String clientId) async {
+    try {
+      final result = await _invitationService.acceptInvitation(code, clientId);
+      if (result.isFailure && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.errorMessage ?? 'Failed to accept invitation'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      // Error already handled in service
+    }
   }
 }

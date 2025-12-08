@@ -3,6 +3,10 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common/primary_button.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/user_provider.dart';
+import '../../utils/deep_link_handler.dart';
+import '../../screens/client/dashboard/today_view_screen.dart';
+import '../../screens/coach/client_management/client_list_view_screen.dart';
 import 'package:provider/provider.dart';
 import 'select_role_screen.dart';
 
@@ -21,6 +25,22 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen> {
   
   bool _isSignUp = true;
   bool _obscurePassword = true;
+  String? _pendingInvitationCode;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPendingInvitationCode();
+  }
+
+  Future<void> _loadPendingInvitationCode() async {
+    final code = await DeepLinkHandler.getPendingInvitationCode();
+    if (mounted) {
+      setState(() {
+        _pendingInvitationCode = code;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -46,8 +66,13 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen> {
 
       if (result.isSuccess && mounted) {
         // Navigate to role selection after successful signup
+        // Pass invitation code if available
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const SelectRoleScreen()),
+          MaterialPageRoute(
+            builder: (_) => SelectRoleScreen(
+              invitationCode: _pendingInvitationCode,
+            ),
+          ),
         );
       } else if (mounted) {
         // Show error in a dialog for better visibility, especially for multi-line errors
@@ -77,11 +102,53 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen> {
       );
 
       if (result.isSuccess && mounted) {
-        // Navigate to role selection after successful login
-        // In production, check if user already has a role and route accordingly
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const SelectRoleScreen()),
-        );
+        // After login, check user's role and onboarding status
+        final userProvider = context.read<UserProvider>();
+        final userId = authProvider.user?.uid;
+        
+        if (userId != null) {
+          await userProvider.loadUser(userId);
+          
+          // Check if user is a client
+          if (userProvider.currentClient != null) {
+            final client = userProvider.currentClient!;
+            // If onboarding completed, go to dashboard
+            if (client.onboardingCompleted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => const TodayViewScreen(),
+                ),
+              );
+            } else {
+              // Navigate to onboarding
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => SelectRoleScreen(
+                    invitationCode: _pendingInvitationCode,
+                  ),
+                ),
+              );
+            }
+          } 
+          // Check if user is a coach
+          else if (userProvider.currentCoach != null) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const ClientListViewScreen(),
+              ),
+            );
+          } 
+          // No role set yet, go to role selection
+          else {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => SelectRoleScreen(
+                  invitationCode: _pendingInvitationCode,
+                ),
+              ),
+            );
+          }
+        }
       } else if (mounted) {
         // Show error in a dialog for better visibility, especially for multi-line errors
         showDialog(

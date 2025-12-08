@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:app_links/app_links.dart';
 import 'firebase_options.dart';
 import 'theme/app_theme.dart';
 import 'providers/auth_provider.dart';
+import 'providers/user_provider.dart';
+import 'utils/deep_link_handler.dart';
 import 'screens/auth/welcome_screen.dart';
-import 'screens/auth/sign_up_login_screen.dart';
 import 'screens/auth/select_role_screen.dart';
-import 'screens/client/dashboard/today_view_screen.dart';
-import 'screens/coach/client_management/client_list_view_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,44 @@ void main() async {
     // Continue anyway - the error will be caught when trying to use Firebase
   }
   
+  // Initialize deep link handling
+  _initDeepLinks();
+  
   runApp(const CoachDashboardApp());
+}
+
+/// Initialize deep link handling for App Links and Universal Links
+void _initDeepLinks() async {
+  final appLinks = AppLinks();
+  
+  try {
+    // Handle initial link (if app was opened via deep link when not running)
+    final initialLink = await appLinks.getInitialLink();
+    if (initialLink != null) {
+      print('App opened via deep link: ${initialLink.toString()}');
+      final code = await DeepLinkHandler.extractInvitationCode(initialLink);
+      if (code != null) {
+        await DeepLinkHandler.storeInvitationCode(code);
+        print('Stored invitation code: $code');
+      }
+    }
+    
+    // Listen for deep links while app is running
+    appLinks.uriLinkStream.listen((uri) async {
+      print('Deep link received: ${uri.toString()}');
+      final code = await DeepLinkHandler.extractInvitationCode(uri);
+      if (code != null) {
+        await DeepLinkHandler.storeInvitationCode(code);
+        print('Stored invitation code from stream: $code');
+        // The invitation code will be picked up by SignUpLoginScreen
+        // when it loads and checks for pending codes
+      }
+    }, onError: (err) {
+      print('Deep link error: $err');
+    });
+  } catch (e) {
+    print('Error initializing deep links: $e');
+  }
 }
 
 class CoachDashboardApp extends StatelessWidget {
@@ -31,8 +68,11 @@ class CoachDashboardApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
       child: MaterialApp(
         title: 'Coach Dashboard',
         theme: AppTheme.lightTheme,

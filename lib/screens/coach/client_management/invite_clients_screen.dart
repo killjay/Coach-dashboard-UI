@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_card.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../services/invitation_service.dart';
 
 class InviteClientsScreen extends StatefulWidget {
   const InviteClientsScreen({super.key});
@@ -15,7 +18,15 @@ class InviteClientsScreen extends StatefulWidget {
 
 class _InviteClientsScreenState extends State<InviteClientsScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final String _inviteLink = 'coachapp.com/invite/a1b2c3d4';
+  final InvitationService _invitationService = InvitationService();
+  String? _currentInviteLink;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _generateShareableLink();
+  }
 
   @override
   void dispose() {
@@ -23,7 +34,32 @@ class _InviteClientsScreenState extends State<InviteClientsScreen> {
     super.dispose();
   }
 
-  void _sendInvite() {
+  Future<void> _generateShareableLink() async {
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final coachId = authProvider.user?.uid;
+      
+      if (coachId == null) {
+        return;
+      }
+
+      // Create a shareable invitation (no email)
+      final result = await _invitationService.createInvitation(
+        coachId: coachId,
+      );
+
+      if (result.isSuccess && result.dataOrNull != null) {
+        final invitation = result.dataOrNull!;
+        setState(() {
+          _currentInviteLink = 'https://coachapp.com/invite/${invitation.code}';
+        });
+      }
+    } catch (e) {
+      // Handle error silently, will show error when user tries to use it
+    }
+  }
+
+  Future<void> _sendInvite() async {
     final emails = _emailController.text.trim();
     if (emails.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,18 +86,84 @@ class _InviteClientsScreenState extends State<InviteClientsScreen> {
       return;
     }
 
-    // Send invitations
-    _emailController.clear();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Invitations sent!'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final coachId = authProvider.user?.uid;
+
+      if (coachId == null) {
+        throw Exception('Coach not authenticated');
+      }
+
+      // Create invitation for each email
+      int successCount = 0;
+      int failCount = 0;
+
+      for (final email in emailList) {
+        final result = await _invitationService.createInvitation(
+          coachId: coachId,
+          email: email,
+        );
+
+        if (result.isSuccess) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      }
+
+      _emailController.clear();
+
+      if (mounted) {
+        if (failCount == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Successfully sent ${successCount} invitation(s)!'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Sent ${successCount} invitation(s), ${failCount} failed'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error sending invitations: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   void _copyLink() {
-    Clipboard.setData(ClipboardData(text: 'https://$_inviteLink'));
+    if (_currentInviteLink == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Generating link...'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    Clipboard.setData(ClipboardData(text: _currentInviteLink!));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Link copied!'),
@@ -207,8 +309,8 @@ class _InviteClientsScreenState extends State<InviteClientsScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: PrimaryButton(
-                        text: 'Send Invite',
-                        onPressed: _sendInvite,
+                        text: _isLoading ? 'Sending...' : 'Send Invite',
+                        onPressed: _isLoading ? null : _sendInvite,
                       ),
                     ),
                     const SizedBox(height: 48),
@@ -238,9 +340,11 @@ class _InviteClientsScreenState extends State<InviteClientsScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              _inviteLink,
+                              _currentInviteLink ?? 'Generating link...',
                               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Colors.white,
+                                    color: _currentInviteLink != null
+                                        ? Colors.white
+                                        : Colors.white.withOpacity(0.5),
                                     fontWeight: FontWeight.w500,
                                   ),
                             ),

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../services/user_service.dart';
+import '../../../models/client_model.dart';
 import 'client_profile_view_screen.dart';
 import 'invite_clients_screen.dart';
 import '../analytics/compliance_dashboard_screen.dart';
@@ -21,9 +25,12 @@ class ClientListViewScreen extends StatefulWidget {
 
 class _ClientListViewScreenState extends State<ClientListViewScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final UserService _userService = UserService();
   String _selectedSort = 'Name (A-Z)';
   String? _selectedFilter;
   String _searchQuery = '';
+  List<ClientModel> _clients = [];
+  bool _isLoading = true;
 
   final List<String> _sortOptions = [
     'Name (A-Z)',
@@ -34,44 +41,59 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
     'Compliance (Low to High)',
   ];
 
-  // Mock data
-  final List<ClientData> _allClients = [
-    ClientData(
-      name: 'Eleanor Pena',
-      lastLogin: '2 hours ago',
-      lastWorkout: 'Yesterday',
-      compliance: 92,
-      status: ClientStatus.active,
-      profilePicture: null,
-    ),
-    ClientData(
-      name: 'Alex Morgan',
-      lastLogin: '1 day ago',
-      lastWorkout: '2 days ago',
-      compliance: 85,
-      status: ClientStatus.active,
-      profilePicture: null,
-    ),
-    ClientData(
-      name: 'Sarah Williams',
-      lastLogin: '3 days ago',
-      lastWorkout: '3 days ago',
-      compliance: 78,
-      status: ClientStatus.active,
-      profilePicture: null,
-    ),
-    ClientData(
-      name: 'Mike Chen',
-      lastLogin: '5 days ago',
-      lastWorkout: '1 week ago',
-      compliance: 65,
-      status: ClientStatus.atRisk,
-      profilePicture: null,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text;
+      });
+    });
+    _subscribeToClients();
+  }
 
-  List<ClientData> get _filteredClients {
-    var clients = _allClients;
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _subscribeToClients() {
+    final authProvider = context.read<AuthProvider>();
+    final coachId = authProvider.user?.uid;
+
+    if (coachId == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    // Subscribe to real-time client list
+    _userService.streamClientList(coachId).listen((clients) {
+      if (mounted) {
+        setState(() {
+          _clients = clients;
+          _isLoading = false;
+        });
+      }
+    }, onError: (error) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading clients: ${error.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
+  }
+
+  List<ClientModel> get _filteredClients {
+    var clients = _clients;
     
     // Filter by search query
     if (_searchQuery.isNotEmpty) {
@@ -88,17 +110,11 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
       case 'Name (Z-A)':
         clients.sort((a, b) => b.name.compareTo(a.name));
         break;
-      case 'Last Login (Newest)':
-        // In production, this would sort by actual date
-        break;
-      case 'Last Login (Oldest)':
-        // In production, this would sort by actual date
-        break;
       case 'Compliance (High to Low)':
-        clients.sort((a, b) => b.compliance.compareTo(a.compliance));
+        // Note: Compliance calculation would need to be added
         break;
       case 'Compliance (Low to High)':
-        clients.sort((a, b) => a.compliance.compareTo(b.compliance));
+        // Note: Compliance calculation would need to be added
         break;
     }
     
@@ -106,14 +122,7 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
   }
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final filteredClients = _filteredClients;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
@@ -269,26 +278,32 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
             const SizedBox(height: 12),
             // Client List
             Expanded(
-              child: filteredClients.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No clients found',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: AppColors.textSecondaryDark,
-                            ),
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
                       ),
                     )
-                  : ListView.builder(
-                padding: const EdgeInsets.all(16.0),
-                      itemCount: filteredClients.length,
-                      itemBuilder: (context, index) {
-                        final client = filteredClients[index];
-                        return Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                          child: _buildClientCard(client),
-                        );
-                      },
-                    ),
+                  : _filteredClients.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No clients found',
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: AppColors.textSecondaryDark,
+                                ),
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16.0),
+                          itemCount: _filteredClients.length,
+                          itemBuilder: (context, index) {
+                            final client = _filteredClients[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: _buildClientCard(client),
+                            );
+                          },
+                        ),
             ),
           ],
         ),
@@ -297,19 +312,21 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
     );
   }
 
-  Widget _buildClientCard(ClientData client) {
+  Widget _buildClientCard(ClientModel client) {
+    final isOnboarding = !client.onboardingCompleted;
+    
     return AppCard(
       backgroundColor: AppColors.cardDark,
-                          padding: const EdgeInsets.all(16.0),
-                          onTap: () {
+      padding: const EdgeInsets.all(16.0),
+      onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => ClientProfileViewScreen(clientId: client.name),
+            builder: (_) => ClientProfileViewScreen(clientId: client.id),
           ),
         );
-                          },
-                          child: Row(
-                            children: [
+      },
+      child: Row(
+        children: [
           // Profile Picture
           Container(
             width: 48,
@@ -318,93 +335,85 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
               shape: BoxShape.circle,
               color: AppColors.primary20,
             ),
-            child: client.profilePicture != null
+            child: client.profileImageUrl != null
                 ? ClipOval(
                     child: Image.network(
-                      client.profilePicture!,
+                      client.profileImageUrl!,
                       fit: BoxFit.cover,
                     ),
                   )
                 : Center(
-                                child: Text(
-                      client.name[0],
+                    child: Text(
+                      client.name.isNotEmpty ? client.name[0].toUpperCase() : '?',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
                           ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 16),
           // Client Info
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Row(
                   children: [
                     Expanded(
                       child: Text(
                         client.name,
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                       ),
                     ),
                     // Status Indicator
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: client.status == ClientStatus.active
-                            ? AppColors.primary
-                            : Colors.orange,
+                    if (isOnboarding)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Onboarding',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Colors.orange,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.primary,
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                                    Text(
-                  'Last workout: ${client.lastWorkout}',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                Text(
+                  isOnboarding
+                      ? 'In Onboarding'
+                      : 'Active Client',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.textSecondaryDark,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-          // Compliance Metric & Chevron
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                    '${client.compliance}%',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                  Text(
-                                    'Compliance',
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondaryDark,
-                          fontSize: 10,
-                                        ),
-                                  ),
-                                ],
-                              ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.textSecondaryDark,
-                size: 24,
-              ),
-            ],
+                      ),
+                ),
+              ],
+            ),
+          ),
+          // Chevron
+          const Icon(
+            Icons.chevron_right,
+            color: AppColors.textSecondaryDark,
+            size: 24,
           ),
         ],
       ),
@@ -550,30 +559,4 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
       ),
     );
   }
-
-
-}
-
-enum ClientStatus {
-  active,
-  atRisk,
-  inactive,
-}
-
-class ClientData {
-  final String name;
-  final String lastLogin;
-  final String lastWorkout;
-  final int compliance;
-  final ClientStatus status;
-  final String? profilePicture;
-
-  ClientData({
-    required this.name,
-    required this.lastLogin,
-    required this.lastWorkout,
-    required this.compliance,
-    required this.status,
-    this.profilePicture,
-  });
 }

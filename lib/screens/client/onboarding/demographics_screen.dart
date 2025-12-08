@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_icon_button.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../providers/user_provider.dart';
+import '../../../models/demographics_model.dart';
 import 'health_screening_screen.dart';
 
 class DemographicsScreen extends StatefulWidget {
@@ -21,7 +25,7 @@ class _DemographicsScreenState extends State<DemographicsScreen> {
 
   final List<String> _genders = ['Male', 'Female', 'Other', 'Prefer not to say'];
 
-  void _handleContinue() {
+  Future<void> _handleContinue() async {
     if (_currentStep == 0 && _selectedDate != null) {
       setState(() => _currentStep = 1);
     } else if (_currentStep == 1 && _selectedGender != null) {
@@ -29,12 +33,75 @@ class _DemographicsScreenState extends State<DemographicsScreen> {
     } else if (_currentStep == 2 && _height != null) {
       setState(() => _currentStep = 3);
     } else if (_currentStep == 3 && _weight != null) {
-      // All demographics collected, navigate to health screening
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const HealthScreeningScreen(),
-        ),
+      // All demographics collected, save and navigate to health screening
+      await _saveDemographics();
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const HealthScreeningScreen(),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _saveDemographics() async {
+    if (_selectedDate == null || _selectedGender == null || _height == null || _weight == null) {
+      return;
+    }
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final userProvider = context.read<UserProvider>();
+      final userId = authProvider.user?.uid;
+
+      if (userId == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User not authenticated. Please sign in again.'),
+            ),
+          );
+        }
+        return;
+      }
+
+      // Convert gender string to enum
+      Gender? genderEnum;
+      switch (_selectedGender!.toLowerCase()) {
+        case 'male':
+          genderEnum = Gender.male;
+          break;
+        case 'female':
+          genderEnum = Gender.female;
+          break;
+        case 'other':
+        case 'prefer not to say':
+          genderEnum = Gender.other;
+          break;
+      }
+
+      final demographics = DemographicsModel(
+        dateOfBirth: _selectedDate!,
+        gender: genderEnum,
+        heightCm: _height!,
+        weightKg: _weight!,
       );
+
+      await userProvider.updateClientOnboarding(
+        clientId: userId,
+        onboardingCompleted: false,
+        demographics: demographics.toJson(),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving demographics: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

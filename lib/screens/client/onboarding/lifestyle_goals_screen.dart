@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_icon_button.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../providers/user_provider.dart';
+import '../../../models/lifestyle_goals_model.dart';
 import '../dashboard/today_view_screen.dart';
 
 class LifestyleGoalsScreen extends StatefulWidget {
@@ -125,14 +129,17 @@ class _LifestyleGoalsScreenState extends State<LifestyleGoalsScreen> {
                   text: 'Continue',
                   onPressed: (_selectedActivityLevel != null &&
                           _selectedFitnessGoal != null)
-                      ? () {
-                          // Save onboarding data and navigate to dashboard
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (_) => const TodayViewScreen(),
-                            ),
-                            (route) => false, // Remove all previous routes
-                          );
+                      ? () async {
+                          await _saveLifestyleGoals();
+                          if (mounted) {
+                            // Navigate to dashboard
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (_) => const TodayViewScreen(),
+                              ),
+                              (route) => false, // Remove all previous routes
+                            );
+                          }
                         }
                       : null,
                 ),
@@ -199,5 +206,82 @@ class _LifestyleGoalsScreenState extends State<LifestyleGoalsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveLifestyleGoals() async {
+    if (_selectedActivityLevel == null || _selectedFitnessGoal == null) {
+      return;
+    }
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final userProvider = context.read<UserProvider>();
+      final userId = authProvider.user?.uid;
+
+      if (userId == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User not authenticated. Please sign in again.'),
+            ),
+          );
+        }
+        return;
+      }
+
+      // Convert string to enum
+      ActivityLevel? activityLevelEnum;
+      switch (_selectedActivityLevel!.toLowerCase().replaceAll(' ', '_')) {
+        case 'sedentary':
+          activityLevelEnum = ActivityLevel.sedentary;
+          break;
+        case 'lightly_active':
+          activityLevelEnum = ActivityLevel.lightlyActive;
+          break;
+        case 'moderately_active':
+          activityLevelEnum = ActivityLevel.moderatelyActive;
+          break;
+        case 'very_active':
+          activityLevelEnum = ActivityLevel.veryActive;
+          break;
+      }
+
+      FitnessGoal? fitnessGoalEnum;
+      switch (_selectedFitnessGoal!.toLowerCase().replaceAll(' ', '_')) {
+        case 'fat_loss':
+          fitnessGoalEnum = FitnessGoal.fatLoss;
+          break;
+        case 'muscle_gain':
+          fitnessGoalEnum = FitnessGoal.muscleGain;
+          break;
+        case 'maintenance':
+          fitnessGoalEnum = FitnessGoal.maintenance;
+          break;
+        case 'performance':
+          fitnessGoalEnum = FitnessGoal.performance;
+          break;
+      }
+
+      final lifestyleGoals = LifestyleGoalsModel(
+        activityLevel: activityLevelEnum,
+        fitnessGoal: fitnessGoalEnum,
+      );
+
+      // Mark onboarding as complete
+      await userProvider.updateClientOnboarding(
+        clientId: userId,
+        onboardingCompleted: true, // Mark as complete
+        lifestyleGoals: lifestyleGoals.toJson(),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving lifestyle goals: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
