@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
 import '../../../widgets/common/primary_button.dart';
+import '../../../providers/user_provider.dart';
+import '../../../providers/workout_provider.dart';
+import '../../../providers/diet_provider.dart';
+import '../../../services/workout_service.dart';
+import '../../../services/diet_service.dart';
+import '../../../services/firestore_service.dart';
+import '../../../services/user_service.dart';
+import '../../../models/client_model.dart';
+import '../../../models/assigned_workout_model.dart';
+import '../../../models/assigned_diet_model.dart';
 
 class AssignPlansScreen extends StatefulWidget {
   final String? preSelectedClientId;
@@ -22,32 +33,61 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
   DateTime _startDate = DateTime.now().add(const Duration(days: 1));
   String? _selectedWorkoutTemplate;
   String? _selectedDietPlan;
-
-  late List<ClientData> _allClients;
+  
+  final WorkoutService _workoutService = WorkoutService();
+  final DietService _dietService = DietService();
+  final FirestoreService _firestoreService = FirestoreService();
+  
+  List<ClientModel> _allClients = [];
+  Map<String, bool> _selectedClients = {};
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _allClients = [
-      ClientData(name: 'Alex Morgan', isSelected: false),
-      ClientData(name: 'James Anderson', isSelected: false),
-      ClientData(name: 'Serena Williams', isSelected: false),
-      ClientData(name: 'Michael Chen', isSelected: false),
-      ClientData(name: 'Emma Thompson', isSelected: false),
-    ];
+    _loadClients();
+    _loadPlans();
     
     // Pre-select client if provided
     if (widget.preSelectedClientId != null) {
-      for (var client in _allClients) {
-        if (client.name == widget.preSelectedClientId) {
-          client.isSelected = true;
-          break;
-        }
+      _selectedClients[widget.preSelectedClientId!] = true;
+    }
+  }
+
+  Future<void> _loadClients() async {
+    final userProvider = context.read<UserProvider>();
+    final coachId = userProvider.currentCoach?.id ?? userProvider.currentUser?.id;
+    
+    if (coachId != null) {
+      final userService = UserService();
+      final result = await userService.getClientList(coachId);
+      if (result.isSuccess && mounted) {
+        setState(() {
+          _allClients = result.dataOrNull ?? [];
+          // Initialize selection map
+          for (var client in _allClients) {
+            if (!_selectedClients.containsKey(client.id)) {
+              _selectedClients[client.id] = false;
+            }
+          }
+        });
       }
     }
   }
 
-  List<ClientData> get _filteredClients {
+  Future<void> _loadPlans() async {
+    final userProvider = context.read<UserProvider>();
+    final workoutProvider = context.read<WorkoutProvider>();
+    final dietProvider = context.read<DietProvider>();
+    
+    final coachId = userProvider.currentCoach?.id ?? userProvider.currentUser?.id;
+    if (coachId != null) {
+      await workoutProvider.loadTemplates(coachId);
+      await dietProvider.loadPlans(coachId);
+    }
+  }
+
+  List<ClientModel> get _filteredClients {
     if (_searchController.text.isEmpty) {
       return _allClients;
     }
@@ -58,21 +98,22 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
 
   bool get _isAllSelected {
     final filtered = _filteredClients;
-    return filtered.isNotEmpty && filtered.every((client) => client.isSelected);
+    if (filtered.isEmpty) return false;
+    return filtered.every((client) => _selectedClients[client.id] == true);
   }
 
   void _toggleSelectAll() {
     final allSelected = _isAllSelected;
     setState(() {
       for (var client in _filteredClients) {
-        client.isSelected = !allSelected;
+        _selectedClients[client.id] = !allSelected;
       }
     });
   }
 
-  int get _selectedCount => _allClients.where((c) => c.isSelected).length;
+  int get _selectedCount => _selectedClients.values.where((selected) => selected == true).length;
 
-  void _assignPlans() {
+  Future<void> _assignPlans() async {
     if (_selectedCount == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -93,13 +134,87 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
       return;
     }
 
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Plans assigned to $_selectedCount client(s)!'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final userProvider = context.read<UserProvider>();
+      final coachId = userProvider.currentCoach?.id ?? userProvider.currentUser?.id;
+      
+      if (coachId == null) {
+        throw Exception('Coach ID not found');
+      }
+
+      final selectedClientIds = _selectedClients.entries
+          .where((entry) => entry.value == true)
+          .map((entry) => entry.key)
+          .toList();
+
+      // Assign workout template if selected
+      if (_selectedWorkoutTemplate != null) {
+        for (final clientId in selectedClientIds) {
+          final assignment = AssignedWorkoutModel(
+            id: _firestoreService.generateId('assigned_workouts'),
+            templateId: _selectedWorkoutTemplate!,
+            clientId: clientId,
+            coachId: coachId,
+            startDate: _startDate,
+            status: WorkoutStatus.pending,
+            assignedAt: DateTime.now(),
+          );
+          
+          final result = await _workoutService.assignWorkout(assignment);
+          if (!result.isSuccess) {
+            throw Exception('Failed to assign workout: ${result.errorMessage}');
+          }
+        }
+      }
+
+      // Assign diet plan if selected
+      if (_selectedDietPlan != null) {
+        for (final clientId in selectedClientIds) {
+          final assignment = AssignedDietModel(
+            id: _firestoreService.generateId('assigned_diets'),
+            planId: _selectedDietPlan!,
+            clientId: clientId,
+            coachId: coachId,
+            startDate: _startDate,
+            assignedAt: DateTime.now(),
+          );
+          
+          final result = await _dietService.assignDiet(assignment);
+          if (!result.isSuccess) {
+            throw Exception('Failed to assign diet: ${result.errorMessage}');
+          }
+        }
+      }
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Plans assigned to $_selectedCount client(s)!'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error assigning plans: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   String _formatDate(DateTime date) {
@@ -230,7 +345,7 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
                             padding: const EdgeInsets.all(16.0),
                             onTap: () {
                               setState(() {
-                                client.isSelected = !client.isSelected;
+                                _selectedClients[client.id] = !(_selectedClients[client.id] ?? false);
                               });
                             },
                             child: Row(
@@ -239,7 +354,7 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
                                   radius: 20,
                                   backgroundColor: AppColors.primary20,
                                   child: Text(
-                                    client.name[0],
+                                    client.name.isNotEmpty ? client.name[0].toUpperCase() : '?',
                                     style: const TextStyle(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
@@ -257,10 +372,10 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
                                   ),
                                 ),
                                 Checkbox(
-                                  value: client.isSelected,
+                                  value: _selectedClients[client.id] ?? false,
                                   onChanged: (value) {
                                     setState(() {
-                                      client.isSelected = value ?? false;
+                                      _selectedClients[client.id] = value ?? false;
                                     });
                                   },
                                   activeColor: AppColors.primary,
@@ -283,12 +398,7 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
                     AppCard(
                       backgroundColor: AppColors.cardDark,
                       padding: const EdgeInsets.all(16.0),
-                      onTap: () {
-                        // Navigate to workout template selection
-                        setState(() {
-                          _selectedWorkoutTemplate = 'Full Body Strength';
-                        });
-                      },
+                      onTap: () => _showWorkoutTemplateSelector(),
                       child: Row(
                         children: [
                           Container(
@@ -317,7 +427,7 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  _selectedWorkoutTemplate ?? 'Choose a workout template',
+                                  _getWorkoutTemplateName() ?? 'Choose a workout template',
                                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                         color: _selectedWorkoutTemplate != null
                                             ? Colors.white
@@ -337,12 +447,7 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
                     AppCard(
                       backgroundColor: AppColors.cardDark,
                       padding: const EdgeInsets.all(16.0),
-                      onTap: () {
-                        // Navigate to diet plan selection
-                        setState(() {
-                          _selectedDietPlan = 'High Protein - 2200 kcal';
-                        });
-                      },
+                      onTap: () => _showDietPlanSelector(),
                       child: Row(
                         children: [
                           Container(
@@ -371,7 +476,7 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  _selectedDietPlan ?? 'Choose a diet plan',
+                                  _getDietPlanName() ?? 'Choose a diet plan',
                                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                         color: _selectedDietPlan != null
                                             ? Colors.white
@@ -479,10 +584,12 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
               child: SizedBox(
                 width: double.infinity,
                 child: PrimaryButton(
-                  text: _selectedCount > 0
-                      ? 'Assign to $_selectedCount Client${_selectedCount > 1 ? 's' : ''}'
-                      : 'Assign Plan',
-                  onPressed: _assignPlans,
+                  text: _isLoading
+                      ? 'Assigning...'
+                      : (_selectedCount > 0
+                          ? 'Assign to $_selectedCount Client${_selectedCount > 1 ? 's' : ''}'
+                          : 'Assign Plan'),
+                  onPressed: _isLoading ? null : _assignPlans,
                 ),
               ),
             ),
@@ -491,14 +598,154 @@ class _AssignPlansScreenState extends State<AssignPlansScreen> {
       ),
     );
   }
-}
 
-class ClientData {
-  String name;
-  bool isSelected;
+  String? _getWorkoutTemplateName() {
+    if (_selectedWorkoutTemplate == null) return null;
+    final workoutProvider = context.read<WorkoutProvider>();
+    final template = workoutProvider.templates.firstWhere(
+      (t) => t.id == _selectedWorkoutTemplate,
+      orElse: () => throw StateError('Template not found'),
+    );
+    return template.name;
+  }
 
-  ClientData({
-    required this.name,
-    required this.isSelected,
-  });
+  String? _getDietPlanName() {
+    if (_selectedDietPlan == null) return null;
+    final dietProvider = context.read<DietProvider>();
+    final plan = dietProvider.plans.firstWhere(
+      (p) => p.id == _selectedDietPlan,
+      orElse: () => throw StateError('Plan not found'),
+    );
+    return plan.name;
+  }
+
+  void _showWorkoutTemplateSelector() {
+    final workoutProvider = context.read<WorkoutProvider>();
+    final templates = workoutProvider.templates;
+    
+    if (templates.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No workout templates available. Create one first.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.cardDark,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Select Workout Template',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 16),
+              ...templates.map((template) => ListTile(
+                    title: Text(
+                      template.name,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: template.description != null
+                        ? Text(
+                            template.description!,
+                            style: TextStyle(color: Colors.grey[400]),
+                          )
+                        : null,
+                    onTap: () {
+                      setState(() {
+                        _selectedWorkoutTemplate = template.id;
+                      });
+                      Navigator.pop(context);
+                    },
+                  )),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedWorkoutTemplate = null;
+                  });
+                  Navigator.pop(context);
+                },
+                child: const Text('Clear Selection', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDietPlanSelector() {
+    final dietProvider = context.read<DietProvider>();
+    final plans = dietProvider.plans;
+    
+    if (plans.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No diet plans available. Create one first.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.cardDark,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Select Diet Plan',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 16),
+              ...plans.map((plan) => ListTile(
+                    title: Text(
+                      plan.name,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      '${plan.calories} kcal, ${plan.protein}g Protein',
+                      style: TextStyle(color: Colors.grey[400]),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _selectedDietPlan = plan.id;
+                      });
+                      Navigator.pop(context);
+                    },
+                  )),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedDietPlan = null;
+                  });
+                  Navigator.pop(context);
+                },
+                child: const Text('Clear Selection', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

@@ -1,10 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_card.dart';
 import '../../../widgets/common/primary_button.dart';
+import '../../../providers/user_provider.dart';
+import '../../../services/storage_service.dart';
+import '../../../services/diet_service.dart';
+import '../../../models/food_log_model.dart';
 
 class FoodPhotoLogScreen extends StatefulWidget {
   const FoodPhotoLogScreen({super.key});
@@ -15,8 +20,12 @@ class FoodPhotoLogScreen extends StatefulWidget {
 
 class _FoodPhotoLogScreenState extends State<FoodPhotoLogScreen> {
   final ImagePicker _picker = ImagePicker();
+  final StorageService _storageService = StorageService();
+  final DietService _dietService = DietService();
+  
   XFile? _pickedImage;
   String _selectedMeal = 'Breakfast';
+  bool _isUploading = false;
 
   final List<String> _meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
@@ -40,7 +49,7 @@ class _FoodPhotoLogScreenState extends State<FoodPhotoLogScreen> {
     }
   }
 
-  void _handleUpload() {
+  Future<void> _handleUpload() async {
     if (_pickedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -51,14 +60,84 @@ class _FoodPhotoLogScreenState extends State<FoodPhotoLogScreen> {
       return;
     }
 
-    // TODO: Upload image to Firebase Storage and save food log
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Photo uploaded successfully!'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
-    Navigator.of(context).pop();
+    final userProvider = context.read<UserProvider>();
+    final clientId = userProvider.currentClient?.id ?? userProvider.currentUser?.id;
+    
+    if (clientId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Client ID not found'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isUploading = true);
+
+    try {
+      final imageFile = File(_pickedImage!.path);
+      final now = DateTime.now();
+
+      // Upload image to Firebase Storage
+      final uploadResult = await _storageService.uploadFoodPhoto(
+        imageFile: imageFile,
+        clientId: clientId,
+        date: now,
+      );
+
+      if (uploadResult.isFailure) {
+        throw Exception(uploadResult.errorMessage ?? 'Upload failed');
+      }
+
+      final photoUrl = uploadResult.dataOrNull!;
+
+      // Create a meal entry with the photo
+      // Note: For photo logs, we'll use estimated macros (0) since we don't have nutrition analysis
+      // In a real app, you might integrate with a nutrition API to analyze the photo
+      final meal = MealModel(
+        name: _selectedMeal,
+        calories: 0.0, // Would be calculated from photo analysis in production
+        protein: 0.0,
+        carbs: 0.0,
+        fat: 0.0,
+        photoUrl: photoUrl,
+      );
+
+      // Add meal to today's food log
+      final addMealResult = await _dietService.addMealToLog(
+        clientId,
+        now,
+        meal,
+      );
+
+      if (addMealResult.isFailure) {
+        throw Exception(addMealResult.errorMessage ?? 'Failed to add meal');
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Photo uploaded successfully!'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error uploading photo: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploading = false);
+      }
+    }
   }
 
   @override
@@ -232,8 +311,8 @@ class _FoodPhotoLogScreenState extends State<FoodPhotoLogScreen> {
                   // Upload Button (only shown when image is selected)
                   if (_pickedImage != null)
                     PrimaryButton(
-                      text: 'Upload Photo',
-                      onPressed: _handleUpload,
+                      text: _isUploading ? 'Uploading...' : 'Upload Photo',
+                      onPressed: _isUploading ? null : _handleUpload,
                       height: 56,
                     ),
                 ],

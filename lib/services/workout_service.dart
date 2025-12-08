@@ -148,5 +148,74 @@ class WorkoutService {
       return Failure('Failed to get workout history: $e');
     }
   }
+
+  /// Get assigned workout for a specific date
+  Future<Result<AssignedWorkoutModel?>> getAssignedWorkoutForDate(String clientId, DateTime date) async {
+    try {
+      final startOfDay = DateTime(date.year, date.month, date.day);
+      final endOfDay = startOfDay.add(const Duration(days: 1));
+      
+      final dataList = await _firestoreService.queryCollection(
+        'assigned_workouts',
+        whereField: 'clientId',
+        whereValue: clientId,
+        orderBy: 'startDate',
+        descending: false,
+      );
+      
+      final workouts = dataList.map((data) => AssignedWorkoutModel.fromJson(data)).toList();
+      
+      // Find workout that matches the date
+      final workout = workouts.firstWhere(
+        (w) => w.startDate.isAfter(startOfDay.subtract(const Duration(days: 1))) && 
+               w.startDate.isBefore(endOfDay),
+        orElse: () => throw StateError('No workout found'),
+      );
+      
+      return Success(workout);
+    } catch (e) {
+      return const Success(null);
+    }
+  }
+
+  /// Stream workout logs (real-time)
+  Stream<List<WorkoutLogModel>> streamWorkoutLogs(String clientId) {
+    return _firestoreService.streamQuery(
+      'workout_logs',
+      whereField: 'clientId',
+      whereValue: clientId,
+      orderBy: 'date',
+      descending: true,
+    ).map((dataList) {
+      return dataList.map((data) => WorkoutLogModel.fromJson(data)).toList();
+    });
+  }
+
+  /// Get workout log for a specific date
+  Future<Result<WorkoutLogModel?>> getWorkoutLogForDate(String clientId, DateTime date) async {
+    try {
+      final startOfDay = DateTime(date.year, date.month, date.day);
+      final endOfDay = startOfDay.add(const Duration(days: 1));
+      
+      final dataList = await _firestoreService.queryCollection(
+        'workout_logs',
+        whereField: 'clientId',
+        whereValue: clientId,
+        orderBy: 'date',
+        descending: true,
+      );
+      
+      final logs = dataList.map((data) => WorkoutLogModel.fromJson(data)).toList();
+      final dayLog = logs.firstWhere(
+        (log) => log.date.isAfter(startOfDay.subtract(const Duration(days: 1))) && 
+                 log.date.isBefore(endOfDay),
+        orElse: () => throw StateError('No log found'),
+      );
+      
+      return Success(dayLog);
+    } catch (e) {
+      return const Success(null);
+    }
+  }
 }
 

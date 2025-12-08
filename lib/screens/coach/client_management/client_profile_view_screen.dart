@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
 import '../../../widgets/common/primary_button.dart';
+import '../../../services/user_service.dart';
+import '../../../services/workout_service.dart';
+import '../../../services/diet_service.dart';
+import '../../../services/metrics_service.dart';
+import '../../../services/compliance_service.dart';
+import '../../../models/client_model.dart';
+import '../../../models/workout_log_model.dart';
+import '../../../models/food_log_model.dart';
+import '../../../models/body_metrics_model.dart';
 import '../plan_creation/assign_plans_screen.dart';
 import '../analytics/client_trend_analysis_screen.dart';
 import '../analytics/progress_photos_screen.dart';
@@ -23,16 +33,115 @@ class ClientProfileViewScreen extends StatefulWidget {
 class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
   int _selectedTab = 0;
   final List<String> _tabs = ['Overview', 'Plans', 'Logs', 'Data', 'Chat'];
+  
+  final UserService _userService = UserService();
+  final WorkoutService _workoutService = WorkoutService();
+  final DietService _dietService = DietService();
+  final MetricsService _metricsService = MetricsService();
+  final ComplianceService _complianceService = ComplianceService();
 
-  // Mock data
-  final String _clientName = 'Jane Doe';
-  final String _clientGoal = 'Fat Loss';
-  final List<String> _statusTags = ['Active', 'PCOS'];
-  final double _adherence = 85.0;
-  final int _workoutsThisWeek = 4;
-  final int _workoutsGoal = 5;
-  final double _currentWeight = 155.2;
-  final double _weightChange = -5.8;
+  bool _isLoading = true;
+  ClientModel? _client;
+  double _adherence = 0.0;
+  int _workoutsThisWeek = 0;
+  int _workoutsGoal = 0;
+  double? _currentWeight;
+  double _weightChange = 0.0;
+  List<WorkoutLogModel> _recentWorkouts = [];
+  List<FoodLogModel> _recentFoodLogs = [];
+  List<BodyMetricsModel> _recentMetrics = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadClientData();
+  }
+
+  Future<void> _loadClientData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      // Load client
+      final clientResult = await _userService.getClient(widget.clientId);
+      if (clientResult.isFailure) {
+        setState(() => _isLoading = false);
+        return;
+      }
+      _client = clientResult.dataOrNull;
+
+      // Calculate weekly snapshot
+      final now = DateTime.now();
+      final weekStart = now.subtract(Duration(days: now.weekday - 1));
+      
+      // Get workouts this week
+      final workoutsResult = await _workoutService.getWorkoutHistory(
+        widget.clientId,
+        startDate: weekStart,
+        endDate: now,
+      );
+      if (workoutsResult.isSuccess) {
+        _recentWorkouts = workoutsResult.dataOrNull ?? [];
+        _workoutsThisWeek = _recentWorkouts.where((w) => w.completed).length;
+      }
+
+      // Get assigned workouts to determine goal
+      final assignedResult = await _workoutService.getAssignedWorkouts(widget.clientId);
+      if (assignedResult.isSuccess) {
+        final assigned = assignedResult.dataOrNull ?? [];
+        _workoutsGoal = assigned.length; // Simplified: assume one workout per day
+      }
+
+      // Calculate adherence (weekly compliance)
+      final adherenceResult = await _complianceService.calculateWeeklyCompliance(
+        widget.clientId,
+        weekStart,
+      );
+      if (adherenceResult.isSuccess) {
+        _adherence = adherenceResult.dataOrNull ?? 0.0;
+      }
+
+      // Get latest body metrics
+      final metricsResult = await _metricsService.getLatestMetrics(widget.clientId);
+      if (metricsResult.isSuccess && metricsResult.dataOrNull != null) {
+        final latest = metricsResult.dataOrNull!;
+        _currentWeight = latest.weight;
+        
+        // Get previous weight for change calculation
+        final historyResult = await _metricsService.getMetricsHistory(widget.clientId);
+        if (historyResult.isSuccess) {
+          final history = historyResult.dataOrNull ?? [];
+          if (history.length > 1) {
+            final previous = history[1];
+            if (previous.weight != null && latest.weight != null) {
+              _weightChange = latest.weight! - previous.weight!;
+            }
+          }
+        }
+      }
+
+      // Get recent food logs
+      final foodLogsResult = await _dietService.getDietHistory(
+        widget.clientId,
+        startDate: now.subtract(const Duration(days: 7)),
+        endDate: now,
+      );
+      if (foodLogsResult.isSuccess) {
+        _recentFoodLogs = foodLogsResult.dataOrNull ?? [];
+      }
+
+      setState(() => _isLoading = false);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading client data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +162,7 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                   ),
                   Expanded(
                     child: Text(
-                      _clientName,
+                      _client?.name ?? 'Loading...',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -86,7 +195,7 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        _clientName[0],
+                        (_client?.name ?? '?')[0],
                         style: Theme.of(context).textTheme.displaySmall?.copyWith(
                               color: AppColors.primary,
                               fontWeight: FontWeight.bold,
@@ -97,7 +206,7 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                   const SizedBox(height: 12),
                   // Client Name
                   Text(
-                    _clientName,
+                    _client?.name ?? 'Loading...',
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -106,7 +215,7 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                   const SizedBox(height: 4),
                   // Goal
                   Text(
-                    _clientGoal,
+                    _client?.lifestyleGoals?.fitnessGoal?.toString().split('.').last.replaceAll(RegExp(r'([A-Z])'), r' $1').trim() ?? 'No goal set',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: AppColors.textSecondaryDark,
                         ),
@@ -115,26 +224,38 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                   // Status Tags
                   Wrap(
                     spacing: 8,
-                    children: _statusTags.map((tag) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: tag == 'Active'
-                              ? AppColors.primary20
-                              : AppColors.cardDark,
-                          borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                    children: [
+                      if (_client != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary20,
+                            borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                          ),
+                          child: Text(
+                            'Active',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
                         ),
-                        child: Text(
-                          tag,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: tag == 'Active'
-                                    ? AppColors.primary
-                                    : Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
+                      if (_client?.onboardingCompleted == false)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardDark,
+                            borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                          ),
+                          child: Text(
+                            'Onboarding',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
                         ),
-                      );
-                    }).toList(),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   // Quick Action Buttons
@@ -390,7 +511,9 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                               ),
                         ),
                         Text(
-                          '$_currentWeight lbs',
+                          _currentWeight != null
+                              ? '${_currentWeight!.toStringAsFixed(1)} lbs'
+                              : 'No data',
                           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -437,7 +560,7 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                       MaterialPageRoute(
                         builder: (_) => ClientTrendAnalysisScreen(
                           clientId: widget.clientId,
-                          clientName: _clientName,
+                          clientName: _client?.name ?? 'Client',
                         ),
                       ),
                     );
@@ -463,33 +586,75 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                 ),
           ),
           const SizedBox(height: 12),
-          _buildActivityItem(
-            'Upper Body Workout',
-            'Today',
-            Icons.fitness_center,
-          ),
-          const SizedBox(height: 8),
-          _buildActivityItem(
-            'Progress Photo Uploaded',
-            'Yesterday',
-            Icons.camera_alt,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ProgressPhotosScreen(
-                    clientId: widget.clientId,
-                    clientName: _clientName,
-                  ),
+          if (_isLoading)
+            const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+            )
+          else ...[
+            // Show recent workouts
+            ..._recentWorkouts.take(3).map((workout) {
+              final daysAgo = DateTime.now().difference(workout.date).inDays;
+              String timeText;
+              if (daysAgo == 0) {
+                timeText = 'Today';
+              } else if (daysAgo == 1) {
+                timeText = 'Yesterday';
+              } else {
+                timeText = '$daysAgo days ago';
+              }
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: _buildActivityItem(
+                  'Workout Logged',
+                  timeText,
+                  Icons.fitness_center,
                 ),
               );
-            },
-          ),
-          const SizedBox(height: 8),
-          _buildActivityItem(
-            'Water Goal Completed',
-            '2 days ago',
-            Icons.water_drop,
-          ),
+            }),
+            // Show recent food logs
+            ..._recentFoodLogs.take(2).map((log) {
+              final daysAgo = DateTime.now().difference(log.date).inDays;
+              String timeText;
+              if (daysAgo == 0) {
+                timeText = 'Today';
+              } else if (daysAgo == 1) {
+                timeText = 'Yesterday';
+              } else {
+                timeText = '$daysAgo days ago';
+              }
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: _buildActivityItem(
+                  'Food Logged',
+                  timeText,
+                  Icons.restaurant,
+                ),
+              );
+            }),
+            // Progress photos option
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: _buildActivityItem(
+                'Progress Photos',
+                'View all',
+                Icons.camera_alt,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ProgressPhotosScreen(
+                        clientId: widget.clientId,
+                        clientName: _client?.name ?? 'Client',
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           TextButton(
             onPressed: () {
@@ -663,7 +828,7 @@ class _ClientProfileViewScreenState extends State<ClientProfileViewScreen> {
                 MaterialPageRoute(
                   builder: (_) => ProgressPhotosScreen(
                     clientId: widget.clientId,
-                    clientName: _clientName,
+                    clientName: _client?.name ?? 'Client',
                   ),
                 ),
               );

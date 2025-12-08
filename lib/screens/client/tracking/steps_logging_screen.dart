@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/primary_button.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../services/metrics_service.dart';
+import '../../../services/firestore_service.dart';
+import '../../../models/steps_log_model.dart';
 
 class StepsLoggingScreen extends StatefulWidget {
   const StepsLoggingScreen({super.key});
@@ -14,6 +19,40 @@ class StepsLoggingScreen extends StatefulWidget {
 class _StepsLoggingScreenState extends State<StepsLoggingScreen> {
   DateTime _selectedDate = DateTime.now();
   final TextEditingController _stepsController = TextEditingController();
+  final MetricsService _metricsService = MetricsService();
+  final FirestoreService _firestoreService = FirestoreService();
+  bool _isLoading = false;
+  int _currentSteps = 0;
+  int _goalSteps = 10000;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStepsData();
+  }
+
+  Future<void> _loadStepsData() async {
+    final authProvider = context.read<AuthProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) return;
+
+    final startOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+
+    try {
+      final result = await _metricsService.getStepsLog(clientId, startOfDay);
+      if (result.isSuccess && result.dataOrNull != null) {
+        final stepsLog = result.dataOrNull!;
+        setState(() {
+          _currentSteps = stepsLog.steps;
+          _goalSteps = stepsLog.goal;
+          _stepsController.text = stepsLog.steps.toString();
+        });
+      }
+    } catch (e) {
+      print('Error loading steps data: $e');
+    }
+  }
 
   bool get isToday {
     final now = DateTime.now();
@@ -54,10 +93,11 @@ class _StepsLoggingScreenState extends State<StepsLoggingScreen> {
     );
     if (date != null) {
       setState(() => _selectedDate = date);
+      _loadStepsData();
     }
   }
 
-  void _handleLogSteps() {
+  Future<void> _handleLogSteps() async {
     final stepsText = _stepsController.text.trim();
     if (stepsText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,14 +120,69 @@ class _StepsLoggingScreenState extends State<StepsLoggingScreen> {
       return;
     }
 
-    // TODO: Save steps to Firestore via MetricsProvider
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Steps logged successfully!'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
-    Navigator.of(context).pop();
+    final authProvider = context.read<AuthProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User not authenticated'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final startOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+      
+      final stepsLog = StepsLogModel(
+        id: _firestoreService.generateId('steps_logs'),
+        clientId: clientId,
+        date: startOfDay,
+        steps: steps,
+        goal: _goalSteps,
+        loggedAt: DateTime.now(),
+      );
+
+      final result = await _metricsService.logSteps(stepsLog);
+      
+      if (result.isSuccess) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Steps logged successfully!'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+          Navigator.of(context).pop();
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${result.errorMessage}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error logging steps: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -226,8 +321,8 @@ class _StepsLoggingScreenState extends State<StepsLoggingScreen> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: PrimaryButton(
-                        text: 'Log Steps',
-                        onPressed: _handleLogSteps,
+                        text: _isLoading ? 'Logging...' : 'Log Steps',
+                        onPressed: _isLoading ? null : _handleLogSteps,
                         height: 56,
                       ),
                     ),

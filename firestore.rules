@@ -119,6 +119,17 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && resource.data.clientId == getUserId();
     }
     
+    // Steps logs - clients can read/write their own, coaches can read their clients'
+    match /steps_logs/{logId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientId == getUserId() ||
+        (exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
+         exists(/databases/$(database)/documents/clients/$(resource.data.clientId)) &&
+         get(/databases/$(database)/documents/clients/$(resource.data.clientId)).data.coachId == getUserId())
+      );
+      allow write: if isAuthenticated() && resource.data.clientId == getUserId();
+    }
+    
     // Progress photos - clients can read/write their own, coaches can read their clients'
     match /progress_photos/{photoId} {
       allow read: if isAuthenticated() && (

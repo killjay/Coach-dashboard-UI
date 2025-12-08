@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
 import '../../../widgets/common/primary_button.dart';
+import '../../../providers/workout_provider.dart';
+import '../../../providers/diet_provider.dart';
+import '../../../providers/user_provider.dart';
+import '../../../models/workout_template_model.dart';
+import '../../../models/diet_plan_model.dart';
 import '../plan_creation/workout_template_builder_screen.dart';
 import '../plan_creation/diet_plan_builder_screen.dart';
 import '../plan_creation/assign_plans_screen.dart';
@@ -23,55 +29,23 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
   int _selectedTab = 0; // 0 = Workout Templates, 1 = Diet Plans
   final TextEditingController _searchController = TextEditingController();
 
-  // Mock data for workout templates
-  final List<WorkoutTemplate> _workoutTemplates = [
-    WorkoutTemplate(
-      name: 'Full Body Strength - Phase 1',
-      description: '4-Week Program, 3 Workouts/Week',
-      icon: Icons.fitness_center,
-      exerciseCount: 5,
-      duration: '30-45 min',
-    ),
-    WorkoutTemplate(
-      name: 'Cardio Burn',
-      description: '5-Week Program, 4 Workouts/Week',
-      icon: Icons.directions_run,
-      exerciseCount: 6,
-      duration: '45-60 min',
-    ),
-    WorkoutTemplate(
-      name: 'Upper Body Focus',
-      description: '6-Week Program, 2 Workouts/Week',
-      icon: Icons.sports_gymnastics,
-      exerciseCount: 4,
-      duration: '30-40 min',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadPlans();
+  }
 
-  // Mock data for diet plans
-  final List<DietPlan> _dietPlans = [
-    DietPlan(
-      name: 'Muscle Gain Diet',
-      description: 'Calorie Surplus, 3200 kcal/day',
-      icon: Icons.restaurant,
-      calories: 3200,
-      protein: 200,
-    ),
-    DietPlan(
-      name: 'Keto Phase 1',
-      description: '2000 kcal, 150g Protein',
-      icon: Icons.restaurant_menu,
-      calories: 2000,
-      protein: 150,
-    ),
-    DietPlan(
-      name: 'Maintenance Phase',
-      description: '2500 kcal, 180g Protein',
-      icon: Icons.lunch_dining,
-      calories: 2500,
-      protein: 180,
-    ),
-  ];
+  Future<void> _loadPlans() async {
+    final userProvider = context.read<UserProvider>();
+    final workoutProvider = context.read<WorkoutProvider>();
+    final dietProvider = context.read<DietProvider>();
+    
+    final coachId = userProvider.currentCoach?.id ?? userProvider.currentUser?.id;
+    if (coachId != null) {
+      await workoutProvider.loadTemplates(coachId);
+      await dietProvider.loadPlans(coachId);
+    }
+  }
 
   @override
   void dispose() {
@@ -228,7 +202,10 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
   }
 
   Widget _buildWorkoutTemplatesList() {
-    if (_workoutTemplates.isEmpty) {
+    final workoutProvider = context.watch<WorkoutProvider>();
+    final templates = workoutProvider.templates;
+    
+    if (templates.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32.0),
@@ -272,9 +249,9 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
 
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      itemCount: _workoutTemplates.length,
+      itemCount: templates.length,
       itemBuilder: (context, index) {
-        final template = _workoutTemplates[index];
+        final template = templates[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: _buildWorkoutTemplateCard(template),
@@ -283,7 +260,7 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
     );
   }
 
-  Widget _buildWorkoutTemplateCard(WorkoutTemplate template) {
+  Widget _buildWorkoutTemplateCard(WorkoutTemplateModel template) {
     return AppCard(
       backgroundColor: AppColors.cardDark,
       padding: const EdgeInsets.all(16.0),
@@ -306,7 +283,7 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
               borderRadius: BorderRadius.circular(AppTheme.radiusDefault),
             ),
             child: Icon(
-              template.icon,
+              Icons.fitness_center,
               color: AppColors.primary,
               size: 24,
             ),
@@ -326,7 +303,7 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  template.description,
+                  template.description ?? '${template.exercises.length} Exercises',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.textSecondaryDark,
                       ),
@@ -346,7 +323,10 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
   }
 
   Widget _buildDietPlansList() {
-    if (_dietPlans.isEmpty) {
+    final dietProvider = context.watch<DietProvider>();
+    final plans = dietProvider.plans;
+    
+    if (plans.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32.0),
@@ -390,9 +370,9 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
 
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      itemCount: _dietPlans.length,
+      itemCount: plans.length,
       itemBuilder: (context, index) {
-        final plan = _dietPlans[index];
+        final plan = plans[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: _buildDietPlanCard(plan),
@@ -401,7 +381,7 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
     );
   }
 
-  Widget _buildDietPlanCard(DietPlan plan) {
+  Widget _buildDietPlanCard(DietPlanModel plan) {
     return AppCard(
       backgroundColor: AppColors.cardDark,
       padding: const EdgeInsets.all(16.0),
@@ -424,7 +404,7 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
               borderRadius: BorderRadius.circular(AppTheme.radiusDefault),
             ),
             child: Icon(
-              plan.icon,
+              Icons.restaurant,
               color: AppColors.primary,
               size: 24,
             ),
@@ -444,7 +424,7 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  plan.description,
+                  plan.description ?? '${plan.calories} kcal, ${plan.protein}g Protein',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.textSecondaryDark,
                       ),
@@ -574,37 +554,5 @@ class _PlansOverviewScreenState extends State<PlansOverviewScreen> {
       ),
     );
   }
-}
-
-class WorkoutTemplate {
-  final String name;
-  final String description;
-  final IconData icon;
-  final int exerciseCount;
-  final String duration;
-
-  WorkoutTemplate({
-    required this.name,
-    required this.description,
-    required this.icon,
-    required this.exerciseCount,
-    required this.duration,
-  });
-}
-
-class DietPlan {
-  final String name;
-  final String description;
-  final IconData icon;
-  final int calories;
-  final int protein;
-
-  DietPlan({
-    required this.name,
-    required this.description,
-    required this.icon,
-    required this.calories,
-    required this.protein,
-  });
 }
 

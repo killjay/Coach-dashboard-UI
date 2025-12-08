@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
+import '../../../providers/user_provider.dart';
+import '../../../providers/workout_provider.dart';
+import '../../../services/firestore_service.dart';
+import '../../../models/workout_template_model.dart';
+import '../../../models/exercise_model.dart';
 import 'custom_exercise_creation_screen.dart';
 
 class WorkoutTemplateBuilderScreen extends StatefulWidget {
@@ -16,6 +22,8 @@ class _WorkoutTemplateBuilderScreenState extends State<WorkoutTemplateBuilderScr
   final TextEditingController _templateNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final List<ExerciseData> _exercises = [];
+  final FirestoreService _firestoreService = FirestoreService();
+  bool _isSaving = false;
 
   @override
   void dispose() {
@@ -24,7 +32,7 @@ class _WorkoutTemplateBuilderScreenState extends State<WorkoutTemplateBuilderScr
     super.dispose();
   }
 
-  void _saveTemplate() {
+  Future<void> _saveTemplate() async {
     if (_templateNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -45,13 +53,67 @@ class _WorkoutTemplateBuilderScreenState extends State<WorkoutTemplateBuilderScr
       return;
     }
 
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Workout template saved successfully!'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+    setState(() => _isSaving = true);
+
+    try {
+      final userProvider = context.read<UserProvider>();
+      final workoutProvider = context.read<WorkoutProvider>();
+      final coachId = userProvider.currentCoach?.id ?? userProvider.currentUser?.id;
+      
+      if (coachId == null) {
+        throw Exception('Coach ID not found');
+      }
+
+      // Convert ExerciseData to ExerciseModel
+      final exerciseModels = _exercises.map((exercise) {
+        return ExerciseModel(
+          name: exercise.name,
+          sets: exercise.sets,
+          reps: exercise.reps,
+          weight: exercise.weight,
+          rpe: exercise.rpe?.toString(),
+          notes: exercise.notes.isEmpty ? null : exercise.notes,
+        );
+      }).toList();
+
+      // Create WorkoutTemplateModel
+      final template = WorkoutTemplateModel(
+        id: _firestoreService.generateId('workout_templates'),
+        name: _templateNameController.text.trim(),
+        exercises: exerciseModels,
+        createdBy: coachId,
+        createdAt: DateTime.now(),
+        description: _descriptionController.text.trim().isEmpty 
+            ? null 
+            : _descriptionController.text.trim(),
+      );
+
+      // Save via provider
+      await workoutProvider.createTemplate(template);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Workout template saved successfully!'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving template: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   void _addExercise() {
@@ -214,14 +276,23 @@ class _WorkoutTemplateBuilderScreenState extends State<WorkoutTemplateBuilderScr
                     ),
                   ),
                   GestureDetector(
-                    onTap: _saveTemplate,
-                    child: Text(
-                      'Save',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
+                    onTap: _isSaving ? null : _saveTemplate,
+                    child: _isSaving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                            ),
+                          )
+                        : Text(
+                            'Save',
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
-                    ),
                   ),
                 ],
               ),

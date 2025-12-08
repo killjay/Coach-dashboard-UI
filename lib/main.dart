@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 import 'theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
+import 'providers/workout_provider.dart';
+import 'providers/diet_provider.dart';
 import 'utils/deep_link_handler.dart';
 import 'screens/auth/welcome_screen.dart';
 import 'screens/auth/select_role_screen.dart';
@@ -72,6 +74,8 @@ class CoachDashboardApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => WorkoutProvider()),
+        ChangeNotifierProvider(create: (_) => DietProvider()),
       ],
       child: MaterialApp(
         title: 'Coach Dashboard',

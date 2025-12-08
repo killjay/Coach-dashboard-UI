@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to get current user ID
+    function getUserId() {
+      return request.auth.uid;
+    }
+    
+    // Food photos - clients can upload/read their own, coaches can read their clients'
+    match /food_photos/{clientId}/{allPaths=**} {
+      // Allow clients to read/write their own food photos
+      allow read, write: if isAuthenticated() && getUserId() == clientId;
+      
+      // Allow coaches to read their clients' food photos
+      // Note: This requires checking Firestore to verify coach-client relationship
+      // For simplicity, we allow read if authenticated (coaches can access via app logic)
+      allow read: if isAuthenticated();
+    }
+    
+    // Progress photos - clients can upload/read their own, coaches can read their clients'
+    match /progress_photos/{clientId}/{allPaths=**} {
+      // Allow clients to read/write their own progress photos
+      allow read, write: if isAuthenticated() && getUserId() == clientId;
+      
+      // Allow coaches to read their clients' progress photos
+      allow read: if isAuthenticated();
+    }
+    
+    // Profile pictures - users can upload/read their own
+    match /profile_pictures/{userId}/{allPaths=**} {
+      allow read, write: if isAuthenticated() && getUserId() == userId;
+    }
+    
+    // Exercise media - public read, coaches can write
+    match /exercise_media/{allPaths=**} {
+      allow read: if isAuthenticated();
+      // Coaches can upload exercise media (would need additional check in production)
+      allow write: if isAuthenticated();
+    }
+  }
+}
+

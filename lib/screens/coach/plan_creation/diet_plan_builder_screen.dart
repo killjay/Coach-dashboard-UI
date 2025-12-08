@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
 import '../../../widgets/common/primary_button.dart';
+import '../../../providers/user_provider.dart';
+import '../../../providers/diet_provider.dart';
+import '../../../services/firestore_service.dart';
+import '../../../models/diet_plan_model.dart';
 
 class DietPlanBuilderScreen extends StatefulWidget {
   const DietPlanBuilderScreen({super.key});
@@ -19,6 +24,8 @@ class _DietPlanBuilderScreenState extends State<DietPlanBuilderScreen> {
   final TextEditingController _carbsController = TextEditingController(text: '200');
   final TextEditingController _fatsController = TextEditingController(text: '71');
   final TextEditingController _generalNotesController = TextEditingController();
+  final FirestoreService _firestoreService = FirestoreService();
+  bool _isSaving = false;
 
   final List<MealData> _meals = [
     MealData(name: 'Meal 1: Breakfast', content: ''),
@@ -48,15 +55,115 @@ class _DietPlanBuilderScreenState extends State<DietPlanBuilderScreen> {
     });
   }
 
-  void _saveTemplate() {
-    // Save the diet template
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Diet template saved successfully!'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+  Future<void> _saveTemplate() async {
+    if (_templateNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a template name'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final calories = int.tryParse(_caloriesController.text) ?? 0;
+    final protein = double.tryParse(_proteinController.text) ?? 0.0;
+    final carbs = double.tryParse(_carbsController.text) ?? 0.0;
+    final fat = double.tryParse(_fatsController.text) ?? 0.0;
+
+    if (calories <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter valid calories'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Validate macro totals (approximate: 1g protein = 4 cal, 1g carbs = 4 cal, 1g fat = 9 cal)
+    final calculatedCalories = (protein * 4) + (carbs * 4) + (fat * 9);
+    final difference = (calculatedCalories - calories).abs();
+    
+    if (difference > 100) {
+      // Warn if macros don't match calories (allow some tolerance)
+      final shouldContinue = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: AppColors.cardDark,
+          title: const Text('Macro Mismatch', style: TextStyle(color: Colors.white)),
+          content: Text(
+            'Macros calculate to ${calculatedCalories.toInt()} calories, but you entered $calories. Continue anyway?',
+            style: const TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Continue', style: TextStyle(color: AppColors.primary)),
+            ),
+          ],
+        ),
+      );
+      
+      if (shouldContinue != true) return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      final userProvider = context.read<UserProvider>();
+      final dietProvider = context.read<DietProvider>();
+      final coachId = userProvider.currentCoach?.id ?? userProvider.currentUser?.id;
+      
+      if (coachId == null) {
+        throw Exception('Coach ID not found');
+      }
+
+      // Create DietPlanModel
+      final plan = DietPlanModel(
+        id: _firestoreService.generateId('diet_plans'),
+        name: _templateNameController.text.trim(),
+        calories: calories,
+        protein: protein,
+        carbs: carbs,
+        fat: fat,
+        createdBy: coachId,
+        createdAt: DateTime.now(),
+        description: _generalNotesController.text.trim().isEmpty 
+            ? null 
+            : _generalNotesController.text.trim(),
+      );
+
+      // Save via provider
+      await dietProvider.createPlan(plan);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Diet template saved successfully!'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving template: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   @override
@@ -96,14 +203,23 @@ class _DietPlanBuilderScreenState extends State<DietPlanBuilderScreen> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: _saveTemplate,
-                    child: Text(
-                      'Save',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
+                    onTap: _isSaving ? null : _saveTemplate,
+                    child: _isSaving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                            ),
+                          )
+                        : Text(
+                            'Save',
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
-                    ),
                   ),
                 ],
               ),

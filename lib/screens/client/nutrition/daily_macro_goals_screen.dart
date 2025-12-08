@@ -1,29 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/progress_ring.dart';
 import '../../../widgets/common/app_card.dart';
 import '../../../widgets/common/primary_button.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../services/diet_service.dart';
+import '../../../models/diet_plan_model.dart';
+import '../../../models/food_log_model.dart';
 import 'manual_food_logging_screen.dart';
 
-class DailyMacroGoalsScreen extends StatelessWidget {
+class DailyMacroGoalsScreen extends StatefulWidget {
   const DailyMacroGoalsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Mock data
-    const double eatenCalories = 820.0;
-    const double goalCalories = 2500.0;
-    const double remainingCalories = goalCalories - eatenCalories;
-    const double progress = eatenCalories / goalCalories;
+  State<DailyMacroGoalsScreen> createState() => _DailyMacroGoalsScreenState();
+}
 
-    const double proteinEaten = 65.0;
-    const double proteinGoal = 150.0;
-    const double carbsEaten = 95.0;
-    const double carbsGoal = 300.0;
-    const double fatEaten = 25.0;
-    const double fatGoal = 80.0;
+class _DailyMacroGoalsScreenState extends State<DailyMacroGoalsScreen> {
+  final DietService _dietService = DietService();
+  
+  DietPlanModel? _dietPlan;
+  FoodLogModel? _foodLog;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final authProvider = context.read<AuthProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) {
+      setState(() => _isLoading = false);
+      return;
+    }
+
+    final today = DateTime.now();
+    final startOfDay = DateTime(today.year, today.month, today.day);
+
+    try {
+      // Load assigned diet
+      final dietResult = await _dietService.getAssignedDiet(clientId);
+      if (dietResult.isSuccess && dietResult.dataOrNull != null) {
+        final assignedDiet = dietResult.dataOrNull!;
+        final planResult = await _dietService.getPlan(assignedDiet.planId);
+        if (planResult.isSuccess && planResult.dataOrNull != null) {
+          _dietPlan = planResult.dataOrNull;
+        }
+      }
+
+      // Load today's food log
+      final foodLogResult = await _dietService.getDailyMacros(clientId, startOfDay);
+      if (foodLogResult.isSuccess && foodLogResult.dataOrNull != null) {
+        _foodLog = foodLogResult.dataOrNull;
+      }
+    } catch (e) {
+      print('Error loading macro data: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  double get _goalCalories => _dietPlan?.calories.toDouble() ?? 0.0;
+  double get _eatenCalories => _foodLog?.totalCalories ?? 0.0;
+  double get _remainingCalories => (_goalCalories - _eatenCalories).clamp(0.0, double.infinity);
+  double get _calorieProgress => _goalCalories > 0 ? (_eatenCalories / _goalCalories).clamp(0.0, 1.0) : 0.0;
+
+  double get _proteinGoal => _dietPlan?.protein ?? 0.0;
+  double get _proteinEaten => _foodLog?.totalProtein ?? 0.0;
+
+  double get _carbsGoal => _dietPlan?.carbs ?? 0.0;
+  double get _carbsEaten => _foodLog?.totalCarbs ?? 0.0;
+
+  double get _fatGoal => _dietPlan?.fat ?? 0.0;
+  double get _fatEaten => _foodLog?.totalFat ?? 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: AppColors.backgroundDark,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
@@ -61,13 +128,13 @@ class DailyMacroGoalsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             // Central Progress Ring for Calories
             ProgressRing(
-              progress: progress,
+              progress: _calorieProgress,
               size: 200,
               strokeWidth: 16,
               child: Column(
                 children: [
                   Text(
-                    '${remainingCalories.toInt()}',
+                    '${_remainingCalories.toInt()}',
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
                           color: Colors.white,
                           fontSize: 40,
@@ -99,7 +166,7 @@ class DailyMacroGoalsScreen extends StatelessWidget {
                           ),
                     ),
                     Text(
-                      '${eatenCalories.toInt()}',
+                      '${_eatenCalories.toInt()}',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -123,7 +190,7 @@ class DailyMacroGoalsScreen extends StatelessWidget {
                           ),
                     ),
                     Text(
-                      '${goalCalories.toInt()}',
+                      '${_goalCalories.toInt()}',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -138,8 +205,8 @@ class DailyMacroGoalsScreen extends StatelessWidget {
             _buildMacroCard(
               context,
               label: 'Protein',
-              eaten: proteinEaten,
-              goal: proteinGoal,
+              eaten: _proteinEaten,
+              goal: _proteinGoal,
               unit: 'g',
               color: AppColors.primary,
             ),
@@ -147,8 +214,8 @@ class DailyMacroGoalsScreen extends StatelessWidget {
             _buildMacroCard(
               context,
               label: 'Carbs',
-              eaten: carbsEaten,
-              goal: carbsGoal,
+              eaten: _carbsEaten,
+              goal: _carbsGoal,
               unit: 'g',
               color: Colors.orange,
             ),
@@ -156,8 +223,8 @@ class DailyMacroGoalsScreen extends StatelessWidget {
             _buildMacroCard(
               context,
               label: 'Fat',
-              eaten: fatEaten,
-              goal: fatGoal,
+              eaten: _fatEaten,
+              goal: _fatGoal,
               unit: 'g',
               color: Colors.blue,
             ),
@@ -170,7 +237,7 @@ class DailyMacroGoalsScreen extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (_) => const ManualFoodLoggingScreen(),
                   ),
-                );
+                ).then((_) => _loadData()); // Reload after logging
               },
               height: 56,
             ),

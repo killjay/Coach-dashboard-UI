@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/progress_ring.dart';
 import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_card.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../providers/user_provider.dart';
+import '../../../providers/workout_provider.dart';
+import '../../../providers/diet_provider.dart';
+import '../../../services/workout_service.dart';
+import '../../../services/diet_service.dart';
+import '../../../services/metrics_service.dart';
+import '../../../services/compliance_service.dart';
+import '../../../models/assigned_workout_model.dart';
+import '../../../models/workout_template_model.dart';
 import '../workouts/workout_logging_screen.dart';
 import '../workouts/assigned_workouts_list_screen.dart';
 import '../tracking/water_tracker_screen.dart';
@@ -15,8 +26,112 @@ import '../community/community_leaderboards_screen.dart';
 import '../community/personal_badges_screen.dart';
 import '../../shared/general_settings_screen.dart';
 
-class TodayViewScreen extends StatelessWidget {
+class TodayViewScreen extends StatefulWidget {
   const TodayViewScreen({super.key});
+
+  @override
+  State<TodayViewScreen> createState() => _TodayViewScreenState();
+}
+
+class _TodayViewScreenState extends State<TodayViewScreen> {
+  final WorkoutService _workoutService = WorkoutService();
+  final DietService _dietService = DietService();
+  final MetricsService _metricsService = MetricsService();
+  final ComplianceService _complianceService = ComplianceService();
+  
+  AssignedWorkoutModel? _todayWorkout;
+  WorkoutTemplateModel? _workoutTemplate;
+  double _complianceScore = 0.0;
+  double _calorieProgress = 0.0;
+  double _waterProgress = 0.0;
+  double _stepsProgress = 0.0;
+  String _calorieText = '0 / 0 kcal';
+  String _waterText = '0.0 / 0.0 L';
+  String _stepsText = '0 / 0';
+  String _workoutName = 'No workout assigned';
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTodayData();
+  }
+
+  Future<void> _loadTodayData() async {
+    final authProvider = context.read<AuthProvider>();
+    final userProvider = context.read<UserProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) return;
+
+    final today = DateTime.now();
+    final startOfDay = DateTime(today.year, today.month, today.day);
+
+    try {
+      // Load assigned workout for today
+      final workoutResult = await _workoutService.getAssignedWorkoutForDate(clientId, startOfDay);
+      if (workoutResult.isSuccess && workoutResult.dataOrNull != null) {
+        _todayWorkout = workoutResult.dataOrNull;
+        if (_todayWorkout != null) {
+          final templateResult = await _workoutService.getTemplate(_todayWorkout!.templateId);
+          if (templateResult.isSuccess && templateResult.dataOrNull != null) {
+            _workoutTemplate = templateResult.dataOrNull;
+            _workoutName = _workoutTemplate?.name ?? 'Assigned Workout';
+          }
+        }
+      }
+
+      // Load assigned diet and calculate calorie progress
+      final dietResult = await _dietService.getAssignedDiet(clientId);
+      if (dietResult.isSuccess && dietResult.dataOrNull != null) {
+        final assignedDiet = dietResult.dataOrNull!;
+        final planResult = await _dietService.getPlan(assignedDiet.planId);
+        if (planResult.isSuccess && planResult.dataOrNull != null) {
+          final plan = planResult.dataOrNull!;
+          final foodLogResult = await _dietService.getDailyMacros(clientId, startOfDay);
+          final actualCalories = foodLogResult.isSuccess && foodLogResult.dataOrNull != null
+              ? foodLogResult.dataOrNull!.totalCalories
+              : 0.0;
+          _calorieProgress = (actualCalories / plan.calories).clamp(0.0, 1.0);
+          _calorieText = '${actualCalories.toInt()} / ${plan.calories} kcal';
+        }
+      }
+
+      // Load water progress
+      final waterResult = await _metricsService.getWaterLog(clientId, startOfDay);
+      if (waterResult.isSuccess && waterResult.dataOrNull != null) {
+        final waterLog = waterResult.dataOrNull!;
+        _waterProgress = (waterLog.amount / waterLog.goal).clamp(0.0, 1.0);
+        _waterText = '${(waterLog.amount / 1000).toStringAsFixed(1)} / ${(waterLog.goal / 1000).toStringAsFixed(1)} L';
+      } else {
+        _waterText = '0.0 / 3.5 L';
+      }
+
+      // Load steps progress
+      final stepsResult = await _metricsService.getStepsLog(clientId, startOfDay);
+      if (stepsResult.isSuccess && stepsResult.dataOrNull != null) {
+        final stepsLog = stepsResult.dataOrNull!;
+        _stepsProgress = (stepsLog.steps / stepsLog.goal).clamp(0.0, 1.0);
+        _stepsText = '${stepsLog.steps} / ${stepsLog.goal}';
+      } else {
+        _stepsText = '0 / 10000';
+      }
+
+      // Calculate compliance score
+      final complianceResult = await _complianceService.calculateDailyCompliance(clientId, startOfDay);
+      if (complianceResult.isSuccess) {
+        _complianceScore = complianceResult.dataOrNull ?? 0.0;
+      }
+    } catch (e) {
+      print('Error loading today data: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
@@ -37,8 +152,23 @@ class TodayViewScreen extends StatelessWidget {
     return '${weekdays[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}';
   }
 
+  String _getClientName() {
+    final userProvider = context.watch<UserProvider>();
+    return userProvider.currentClient?.name ?? 
+           userProvider.currentUser?.name ?? 
+           'User';
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: AppColors.backgroundDark,
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
       body: SafeArea(
@@ -54,7 +184,7 @@ class TodayViewScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${_getGreeting()}, Alex',
+                          '${_getGreeting()}, ${_getClientName().split(' ').first}',
                           style: Theme.of(context).textTheme.displaySmall?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -101,12 +231,12 @@ class TodayViewScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     // Progress Ring
                     ProgressRing(
-                      progress: 0.75,
+                      progress: _complianceScore / 100,
                       size: 224,
                       child: Column(
                         children: [
                           Text(
-                            '75%',
+                            '${_complianceScore.toInt()}%',
                             style: Theme.of(context).textTheme.displayLarge?.copyWith(
                                   color: Colors.white,
                                   fontSize: 48,
@@ -138,31 +268,35 @@ class TodayViewScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     // Task List
-                    _buildTaskItem(
-                      context,
-                      icon: Icons.fitness_center,
-                      title: 'Upper Body Strength',
-                      subtitle: 'Assigned Workout',
-                      actionButton: PrimaryButton(
-                        text: 'Start',
-                        height: 40,
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        onPressed: () {
-                          // Navigate to Workout Details & Logging screen
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => WorkoutLoggingScreen(),
-                            ),
-                          );
-                        },
+                    if (_todayWorkout != null)
+                      _buildTaskItem(
+                        context,
+                        icon: Icons.fitness_center,
+                        title: _workoutName,
+                        subtitle: 'Assigned Workout',
+                        actionButton: PrimaryButton(
+                          text: 'Start',
+                          height: 40,
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          onPressed: () {
+                            // Navigate to Workout Details & Logging screen
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => WorkoutLoggingScreen(
+                                  assignedWorkoutId: _todayWorkout!.id,
+                                  templateId: _todayWorkout!.templateId,
+                                ),
+                              ),
+                            ).then((_) => _loadTodayData()); // Reload after workout
+                          },
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 12),
                     _buildTaskItem(
                       context,
                       icon: Icons.local_fire_department,
                       title: 'Calorie Goal',
-                      subtitle: '1,800 / 2,500 kcal',
+                      subtitle: _calorieText,
                       actionButton: IconButton(
                         icon: Icon(
                           Icons.add_circle,
@@ -175,7 +309,7 @@ class TodayViewScreen extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (_) => const DailyMacroGoalsScreen(),
                             ),
-                          );
+                          ).then((_) => _loadTodayData()); // Reload after logging
                         },
                       ),
                     ),
@@ -184,7 +318,7 @@ class TodayViewScreen extends StatelessWidget {
                       context,
                       icon: Icons.water_drop,
                       title: 'Water Goal',
-                      subtitle: '2.1 / 3.5 L',
+                      subtitle: _waterText,
                       actionButton: IconButton(
                         icon: Icon(
                           Icons.add_circle,
@@ -197,7 +331,7 @@ class TodayViewScreen extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (_) => WaterTrackerScreen(),
                             ),
-                          );
+                          ).then((_) => _loadTodayData()); // Reload after logging
                         },
                       ),
                     ),
@@ -206,7 +340,7 @@ class TodayViewScreen extends StatelessWidget {
                       context,
                       icon: Icons.directions_walk,
                       title: 'Daily Steps',
-                      subtitle: '8,204 / 10,000',
+                      subtitle: _stepsText,
                       actionButton: IconButton(
                         icon: Icon(
                           Icons.add_circle,
@@ -219,7 +353,7 @@ class TodayViewScreen extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (_) => const StepsLoggingScreen(),
                             ),
-                          );
+                          ).then((_) => _loadTodayData()); // Reload after logging
                         },
                       ),
                     ),

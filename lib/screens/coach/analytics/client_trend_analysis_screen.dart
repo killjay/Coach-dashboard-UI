@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
+import '../../../services/workout_service.dart';
+import '../../../models/workout_log_model.dart';
+import '../../../models/exercise_log_model.dart';
+import '../../../models/set_log_model.dart';
 
 class ClientTrendAnalysisScreen extends StatefulWidget {
   final String clientName;
@@ -20,45 +25,305 @@ class ClientTrendAnalysisScreen extends StatefulWidget {
 
 class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
   int _selectedTimeRange = 1; // 0 = 1M, 1 = 3M, 2 = 6M, 3 = All
-  String _selectedExercise = 'Back Squat';
+  String? _selectedExercise;
   String _selectedMetric = 'Est. 1-Rep Max (lbs)';
 
   final List<String> _timeRanges = ['1M', '3M', '6M', 'All'];
-  final List<String> _exercises = ['Back Squat', 'Bench Press', 'Deadlift', 'Pull Ups'];
+  final WorkoutService _workoutService = WorkoutService();
+  
+  bool _isLoading = true;
+  List<String> _exercises = [];
+  List<WorkoutLogModel> _allWorkoutLogs = [];
+  List<WorkoutHistoryEntry> _workoutHistory = [];
+  
+  double _currentValue = 0.0;
+  double _percentageChange = 0.0;
+  double _personalRecord = 0.0;
+  double _adherence = 0.0;
+  double _avgWeeklyVolume = 0.0;
 
-  // Mock data
-  final double _currentValue = 245.0;
-  final double _percentageChange = 12.0;
-  final double _personalRecord = 245.0;
-  final double _adherence = 92.0;
-  final double _avgWeeklyVolume = 8450.0;
+  @override
+  void initState() {
+    super.initState();
+    _loadWorkoutData();
+  }
 
-  final List<WorkoutHistoryEntry> _workoutHistory = [
-    WorkoutHistoryEntry(
-      date: DateTime(2024, 7, 22),
-      logged: '3x5 @ 245 lbs',
-      prescribed: '3x5 @ 240 lbs',
-      isCompliant: true,
-    ),
-    WorkoutHistoryEntry(
-      date: DateTime(2024, 7, 15),
-      logged: '3x5 @ 240 lbs',
-      prescribed: '3x5 @ 240 lbs',
-      isCompliant: true,
-    ),
-    WorkoutHistoryEntry(
-      date: DateTime(2024, 7, 8),
-      logged: '3x5 @ 235 lbs',
-      prescribed: '3x5 @ 235 lbs',
-      isCompliant: true,
-    ),
-    WorkoutHistoryEntry(
-      date: DateTime(2024, 7, 1),
-      logged: '2x5, 1x3 @ 230 lbs',
-      prescribed: '3x5 @ 230 lbs',
-      isCompliant: false,
-    ),
-  ];
+  Future<void> _loadWorkoutData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      // Determine date range
+      DateTime? startDate;
+      switch (_selectedTimeRange) {
+        case 0: // 1M
+          startDate = DateTime.now().subtract(const Duration(days: 30));
+          break;
+        case 1: // 3M
+          startDate = DateTime.now().subtract(const Duration(days: 90));
+          break;
+        case 2: // 6M
+          startDate = DateTime.now().subtract(const Duration(days: 180));
+          break;
+        case 3: // All
+          startDate = null;
+          break;
+      }
+
+      // Load workout logs
+      final logsResult = await _workoutService.getWorkoutHistory(
+        widget.clientId,
+        startDate: startDate,
+      );
+
+      if (logsResult.isSuccess) {
+        _allWorkoutLogs = logsResult.dataOrNull ?? [];
+        
+        // Extract unique exercises
+        final exerciseSet = <String>{};
+        for (final log in _allWorkoutLogs) {
+          for (final exercise in log.exercises) {
+            exerciseSet.add(exercise.exerciseName);
+          }
+        }
+        _exercises = exerciseSet.toList()..sort();
+        
+        // Select first exercise if available
+        if (_exercises.isNotEmpty && _selectedExercise == null) {
+          _selectedExercise = _exercises.first;
+        }
+
+        // Update metrics if exercise is selected
+        if (_selectedExercise != null) {
+          _updateMetrics();
+        }
+      }
+
+      setState(() => _isLoading = false);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading workout data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _updateMetrics() {
+    if (_selectedExercise == null) return;
+
+    // Filter logs for selected exercise
+    final exerciseLogs = <ExerciseLogModel>[];
+    for (final workoutLog in _allWorkoutLogs) {
+      for (final exercise in workoutLog.exercises) {
+        if (exercise.exerciseName == _selectedExercise) {
+          exerciseLogs.add(exercise);
+        }
+      }
+    }
+
+    if (exerciseLogs.isEmpty) {
+      _currentValue = 0.0;
+      _percentageChange = 0.0;
+      _personalRecord = 0.0;
+      _adherence = 0.0;
+      _avgWeeklyVolume = 0.0;
+      _workoutHistory = [];
+      return;
+    }
+
+    // Calculate metrics based on selected metric
+    switch (_selectedMetric) {
+      case 'Est. 1-Rep Max (lbs)':
+        _calculate1RM(exerciseLogs);
+        break;
+      case 'Max Weight (lbs)':
+        _calculateMaxWeight(exerciseLogs);
+        break;
+      case 'Total Volume (lbs)':
+        _calculateTotalVolume(exerciseLogs);
+        break;
+      case 'Average Weight (lbs)':
+        _calculateAverageWeight(exerciseLogs);
+        break;
+    }
+
+    // Calculate adherence (simplified: percentage of completed workouts)
+    final totalWorkouts = _allWorkoutLogs.length;
+    final completedWorkouts = _allWorkoutLogs.where((w) => w.completed).length;
+    _adherence = totalWorkouts > 0 ? (completedWorkouts / totalWorkouts * 100) : 0.0;
+
+    // Calculate average weekly volume
+    _calculateWeeklyVolume(exerciseLogs);
+
+    // Build workout history
+    _buildWorkoutHistory();
+  }
+
+  void _calculate1RM(List<ExerciseLogModel> exerciseLogs) {
+    double max1RM = 0.0;
+    double? previous1RM;
+
+    for (final exercise in exerciseLogs.reversed) {
+      for (final set in exercise.sets) {
+        if (set.weight != null && set.reps != null && set.reps! > 0) {
+          // Epley formula: 1RM = weight * (1 + reps/30)
+          final estimated1RM = set.weight! * (1 + set.reps! / 30);
+          if (estimated1RM > max1RM) {
+            max1RM = estimated1RM;
+          }
+        }
+      }
+    }
+
+    _currentValue = max1RM;
+    _personalRecord = max1RM;
+
+    // Find previous value for percentage change
+    if (exerciseLogs.length > 1) {
+      final previousExercise = exerciseLogs[exerciseLogs.length - 2];
+      for (final set in previousExercise.sets) {
+        if (set.weight != null && set.reps != null && set.reps! > 0) {
+          previous1RM = set.weight! * (1 + set.reps! / 30);
+          break;
+        }
+      }
+    }
+
+    if (previous1RM != null && previous1RM > 0) {
+      _percentageChange = ((max1RM - previous1RM) / previous1RM) * 100;
+    }
+  }
+
+  void _calculateMaxWeight(List<ExerciseLogModel> exerciseLogs) {
+    double maxWeight = 0.0;
+    double? previousMax;
+
+    for (final exercise in exerciseLogs.reversed) {
+      for (final set in exercise.sets) {
+        if (set.weight != null && set.weight! > maxWeight) {
+          maxWeight = set.weight!;
+        }
+      }
+    }
+
+    _currentValue = maxWeight;
+    _personalRecord = maxWeight;
+
+    if (exerciseLogs.length > 1) {
+      final previousExercise = exerciseLogs[exerciseLogs.length - 2];
+      for (final set in previousExercise.sets) {
+        if (set.weight != null) {
+          previousMax = set.weight!;
+          break;
+        }
+      }
+    }
+
+    if (previousMax != null && previousMax > 0) {
+      _percentageChange = ((maxWeight - previousMax) / previousMax) * 100;
+    }
+  }
+
+  void _calculateTotalVolume(List<ExerciseLogModel> exerciseLogs) {
+    double totalVolume = 0.0;
+    double? previousVolume;
+
+    for (final exercise in exerciseLogs) {
+      for (final set in exercise.sets) {
+        if (set.weight != null && set.reps != null) {
+          totalVolume += set.weight! * set.reps!;
+        }
+      }
+    }
+
+    _currentValue = totalVolume;
+
+    if (exerciseLogs.length > 1) {
+      final previousExercise = exerciseLogs[exerciseLogs.length - 2];
+      for (final set in previousExercise.sets) {
+        if (set.weight != null && set.reps != null) {
+          previousVolume = (previousVolume ?? 0) + (set.weight! * set.reps!);
+        }
+      }
+    }
+
+    if (previousVolume != null && previousVolume > 0) {
+      _percentageChange = ((totalVolume - previousVolume) / previousVolume) * 100;
+    }
+  }
+
+  void _calculateAverageWeight(List<ExerciseLogModel> exerciseLogs) {
+    double totalWeight = 0.0;
+    int count = 0;
+
+    for (final exercise in exerciseLogs) {
+      for (final set in exercise.sets) {
+        if (set.weight != null) {
+          totalWeight += set.weight!;
+          count++;
+        }
+      }
+    }
+
+    _currentValue = count > 0 ? totalWeight / count : 0.0;
+  }
+
+  void _calculateWeeklyVolume(List<ExerciseLogModel> exerciseLogs) {
+    double totalVolume = 0.0;
+    int weekCount = 0;
+
+    final weekMap = <int, double>{};
+    for (final workoutLog in _allWorkoutLogs) {
+      final week = workoutLog.date.difference(DateTime(2024, 1, 1)).inDays ~/ 7;
+      for (final exercise in workoutLog.exercises) {
+        if (exercise.exerciseName == _selectedExercise) {
+          for (final set in exercise.sets) {
+            if (set.weight != null && set.reps != null) {
+              weekMap[week] = (weekMap[week] ?? 0.0) + (set.weight! * set.reps!);
+            }
+          }
+        }
+      }
+    }
+
+    if (weekMap.isNotEmpty) {
+      totalVolume = weekMap.values.reduce((a, b) => a + b);
+      weekCount = weekMap.length;
+      _avgWeeklyVolume = totalVolume / weekCount;
+    }
+  }
+
+  void _buildWorkoutHistory() {
+    _workoutHistory = [];
+    
+    // Get workout logs containing the selected exercise
+    for (final workoutLog in _allWorkoutLogs.reversed.take(10)) {
+      for (final exercise in workoutLog.exercises) {
+        if (exercise.exerciseName == _selectedExercise) {
+          // Build logged string
+          final loggedSets = exercise.sets
+              .where((s) => s.weight != null && s.reps != null)
+              .map((s) => '${s.reps}x${s.weight!.toInt()} lbs')
+              .join(', ');
+          
+          // Build prescribed string (simplified - would need template data)
+          final prescribed = '${exercise.sets.length} sets';
+          
+          _workoutHistory.add(WorkoutHistoryEntry(
+            date: workoutLog.date,
+            logged: loggedSets.isEmpty ? 'No data' : loggedSets,
+            prescribed: prescribed,
+            isCompliant: exercise.completed,
+          ));
+          break; // Only add once per workout
+        }
+      }
+    }
+  }
 
   String _formatDate(DateTime date) {
     final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -91,7 +356,10 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
                       ? const Icon(Icons.check, color: AppColors.primary)
                       : null,
                   onTap: () {
-                    setState(() => _selectedExercise = exercise);
+                    setState(() {
+                      _selectedExercise = exercise;
+                      _updateMetrics();
+                    });
                     Navigator.pop(context);
                   },
                 )),
@@ -127,7 +395,10 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
                       ? const Icon(Icons.check, color: AppColors.primary)
                       : null,
                   onTap: () {
-                    setState(() => _selectedMetric = metric);
+                    setState(() {
+                      _selectedMetric = metric;
+                      _updateMetrics();
+                    });
                     Navigator.pop(context);
                   },
                 )),
@@ -212,7 +483,7 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            _selectedExercise,
+                            _selectedExercise ?? 'Select Exercise',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -242,6 +513,7 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
                       child: GestureDetector(
                         onTap: () {
                           setState(() => _selectedTimeRange = index);
+                          _loadWorkoutData(); // Reload data for new time range
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -269,9 +541,35 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
             ),
             // Content
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      ),
+                    )
+                  : _exercises.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.fitness_center,
+                                size: 64,
+                                color: AppColors.textSecondaryDark,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No workout data available',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      color: Colors.white,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : SingleChildScrollView(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Performance Metric Display
@@ -306,7 +604,7 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '${_currentValue.toInt()}',
+                                _currentValue > 0 ? _currentValue.toInt().toString() : '—',
                                 style: Theme.of(context).textTheme.displayLarge?.copyWith(
                                       color: Colors.white,
                                       fontSize: 48,
@@ -316,13 +614,14 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    '+${_percentageChange.toStringAsFixed(0)}%',
-                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
+                                  if (_percentageChange != 0)
+                                    Text(
+                                      '${_percentageChange > 0 ? '+' : ''}${_percentageChange.toStringAsFixed(0)}%',
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            color: _percentageChange > 0 ? AppColors.primary : Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
                                 ],
                               ),
                             ],
@@ -365,7 +664,7 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
                           const SizedBox(height: 16),
                           SizedBox(
                             height: 200,
-                            child: _buildGraphPlaceholder(),
+                            child: _buildGraph(),
                           ),
                         ],
                       ),
@@ -510,10 +809,133 @@ class _ClientTrendAnalysisScreenState extends State<ClientTrendAnalysisScreen> {
     );
   }
 
-  Widget _buildGraphPlaceholder() {
-    return CustomPaint(
-      painter: _TrendGraphPainter(),
-      child: Container(),
+  Widget _buildGraph() {
+    if (_workoutHistory.isEmpty) {
+      return Center(
+        child: Text(
+          'No data to display',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondaryDark,
+              ),
+        ),
+      );
+    }
+
+    // Prepare data points
+    final spots = <FlSpot>[];
+    for (int i = 0; i < _workoutHistory.length; i++) {
+      final entry = _workoutHistory[i];
+      // Extract max weight from logged string (simplified)
+      final weightMatch = RegExp(r'(\d+) lbs').firstMatch(entry.logged);
+      if (weightMatch != null) {
+        final weight = double.tryParse(weightMatch.group(1) ?? '0') ?? 0.0;
+        spots.add(FlSpot(i.toDouble(), weight));
+      }
+    }
+
+    if (spots.isEmpty) {
+      return Center(
+        child: Text(
+          'No weight data available',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondaryDark,
+              ),
+        ),
+      );
+    }
+
+    return LineChart(
+      LineChartData(
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          horizontalInterval: 50,
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: Colors.white.withOpacity(0.1),
+              strokeWidth: 1,
+            );
+          },
+        ),
+        titlesData: FlTitlesData(
+          show: true,
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 30,
+              getTitlesWidget: (value, meta) {
+                if (value.toInt() < _workoutHistory.length) {
+                  final date = _workoutHistory[value.toInt()].date;
+                  return Text(
+                    '${date.month}/${date.day}',
+                    style: const TextStyle(
+                      color: Color(0xFF8E8E93),
+                      fontSize: 10,
+                    ),
+                  );
+                }
+                return const Text('');
+              },
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              getTitlesWidget: (value, meta) {
+                return Text(
+                  value.toInt().toString(),
+                  style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 10,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        borderData: FlBorderData(
+          show: true,
+          border: Border.all(
+            color: Colors.white.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+        minX: 0,
+        maxX: spots.length > 1 ? (spots.length - 1).toDouble() : 1,
+        minY: 0,
+        maxY: spots.map((s) => s.y).reduce((a, b) => a > b ? a : b) * 1.2,
+        lineBarsData: [
+          LineChartBarData(
+            spots: spots,
+            isCurved: true,
+            color: AppColors.primary,
+            barWidth: 3,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) {
+                return FlDotCirclePainter(
+                  radius: 4,
+                  color: AppColors.primary,
+                  strokeWidth: 2,
+                  strokeColor: AppColors.backgroundDark,
+                );
+              },
+            ),
+            belowBarData: BarAreaData(
+              show: true,
+              color: AppColors.primary.withOpacity(0.1),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

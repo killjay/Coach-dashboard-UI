@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/progress_ring.dart';
 import '../../../widgets/common/app_card.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../services/metrics_service.dart';
+import '../../../models/water_log_model.dart';
 
 class WaterTrackerScreen extends StatefulWidget {
   const WaterTrackerScreen({super.key});
@@ -14,16 +18,60 @@ class WaterTrackerScreen extends StatefulWidget {
 
 class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
   DateTime _selectedDate = DateTime.now();
-  double _currentAmount = 1500; // ml
-  final double _goalAmount = 2500; // ml
-  final List<WaterEntry> _entries = [
-    WaterEntry(amount: 500, timestamp: DateTime.now().subtract(const Duration(hours: 2))),
-    WaterEntry(amount: 250, timestamp: DateTime.now().subtract(const Duration(hours: 1, minutes: 30))),
-    WaterEntry(amount: 500, timestamp: DateTime.now().subtract(const Duration(minutes: 45))),
-    WaterEntry(amount: 250, timestamp: DateTime.now().subtract(const Duration(minutes: 15))),
-  ];
+  final MetricsService _metricsService = MetricsService();
+  
+  double _currentAmount = 0.0; // ml
+  double _goalAmount = 3500.0; // ml (default 3.5L)
+  List<WaterEntry> _entries = [];
+  bool _isLoading = true;
 
-  double get progress => (_currentAmount / _goalAmount).clamp(0.0, 1.0);
+  @override
+  void initState() {
+    super.initState();
+    _loadWaterData();
+  }
+
+  Future<void> _loadWaterData() async {
+    final authProvider = context.read<AuthProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) {
+      setState(() => _isLoading = false);
+      return;
+    }
+
+    final startOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+
+    try {
+      final result = await _metricsService.getWaterLog(clientId, startOfDay);
+      if (result.isSuccess && result.dataOrNull != null) {
+        final waterLog = result.dataOrNull!;
+        setState(() {
+          _currentAmount = waterLog.amount;
+          _goalAmount = waterLog.goal;
+          // Create entries from log (simplified - in production, you'd track individual entries)
+          _entries = [
+            WaterEntry(amount: waterLog.amount, timestamp: waterLog.loggedAt),
+          ];
+        });
+      } else {
+        // No log for this date, use defaults
+        setState(() {
+          _currentAmount = 0.0;
+          _goalAmount = 3500.0;
+          _entries = [];
+        });
+      }
+    } catch (e) {
+      print('Error loading water data: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  double get progress => _goalAmount > 0 ? (_currentAmount / _goalAmount).clamp(0.0, 1.0) : 0.0;
 
   bool get isToday {
     final now = DateTime.now();
@@ -32,11 +80,39 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
         _selectedDate.day == now.day;
   }
 
-  void _addWater(double amount) {
-    setState(() {
-      _currentAmount = (_currentAmount + amount).clamp(0, _goalAmount * 2);
-      _entries.insert(0, WaterEntry(amount: amount, timestamp: DateTime.now()));
-    });
+  Future<void> _addWater(double amount) async {
+    final authProvider = context.read<AuthProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) return;
+
+    final startOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+
+    try {
+      final result = await _metricsService.addWaterToLog(clientId, startOfDay, amount);
+      if (result.isSuccess && result.dataOrNull != null) {
+        final waterLog = result.dataOrNull!;
+        setState(() {
+          _currentAmount = waterLog.amount;
+          _goalAmount = waterLog.goal;
+          _entries.insert(0, WaterEntry(amount: amount, timestamp: DateTime.now()));
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${result.errorMessage}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error adding water: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _addCustomWater() {
@@ -87,12 +163,14 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
     setState(() {
       _selectedDate = _selectedDate.add(Duration(days: days));
     });
+    _loadWaterData();
   }
 
   void _goToToday() {
     setState(() {
       _selectedDate = DateTime.now();
     });
+    _loadWaterData();
   }
 
   String _formatTime(DateTime time) {
@@ -105,6 +183,13 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: AppColors.backgroundDark,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
       body: SafeArea(

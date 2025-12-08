@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../services/workout_service.dart';
+import '../../../models/assigned_workout_model.dart';
+import '../../../models/workout_template_model.dart';
 import 'workout_logging_screen.dart';
 import '../../shared/exercise_library_screen.dart';
 
@@ -17,6 +22,7 @@ class AssignedWorkoutsListScreen extends StatefulWidget {
 class _AssignedWorkoutsListScreenState extends State<AssignedWorkoutsListScreen> {
   DateTime _selectedDate = DateTime.now();
   final ScrollController _dateScrollController = ScrollController();
+  final WorkoutService _workoutService = WorkoutService();
 
   // Generate dates for the week (3 days before, today, 3 days after)
   List<DateTime> get _dateRange {
@@ -47,31 +53,64 @@ class _AssignedWorkoutsListScreenState extends State<AssignedWorkoutsListScreen>
         date.day == tomorrow.day;
   }
 
-  List<WorkoutData> _getWorkoutsForDate(DateTime date) {
-    // Mock data - in production, this would come from a provider/service
-    if (_isToday(date)) {
-      return [
-        WorkoutData(
-          name: 'Full Body Strength A',
-          status: WorkoutStatus.dueToday,
+  Future<List<WorkoutItem>> _getWorkoutsForDate(DateTime date) async {
+    final authProvider = context.read<AuthProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) return [];
+
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
+    try {
+      final assignedWorkoutsResult = await _workoutService.getAssignedWorkouts(clientId);
+      if (!assignedWorkoutsResult.isSuccess) return [];
+
+      final assignedWorkouts = assignedWorkoutsResult.dataOrNull ?? [];
+      final workoutsForDate = assignedWorkouts.where((w) {
+        return w.startDate.isAfter(startOfDay.subtract(const Duration(days: 1))) &&
+               w.startDate.isBefore(endOfDay);
+      }).toList();
+
+      final workoutItems = <WorkoutItem>[];
+      
+      for (final assignedWorkout in workoutsForDate) {
+        final templateResult = await _workoutService.getTemplate(assignedWorkout.templateId);
+        final templateName = templateResult.isSuccess && templateResult.dataOrNull != null
+            ? templateResult.dataOrNull!.name
+            : 'Workout';
+
+        // Check if workout is logged
+        final logResult = await _workoutService.getWorkoutLogForDate(clientId, startOfDay);
+        final isCompleted = logResult.isSuccess && 
+                           logResult.dataOrNull != null && 
+                           logResult.dataOrNull!.completed;
+
+        WorkoutStatus status;
+        if (isCompleted) {
+          status = WorkoutStatus.completed;
+        } else if (_isToday(date)) {
+          status = WorkoutStatus.dueToday;
+        } else if (date.isBefore(DateTime.now())) {
+          status = WorkoutStatus.dueToday; // Past due
+        } else {
+          status = WorkoutStatus.upcoming;
+        }
+
+        workoutItems.add(WorkoutItem(
+          assignedWorkoutId: assignedWorkout.id,
+          templateId: assignedWorkout.templateId,
+          name: templateName,
+          status: status,
           icon: Icons.fitness_center,
-        ),
-        WorkoutData(
-          name: 'Morning Run - 5k',
-          status: WorkoutStatus.completed,
-          icon: Icons.directions_run,
-        ),
-      ];
-    } else if (_isTomorrow(date)) {
-      return [
-        WorkoutData(
-          name: 'Active Recovery & Stretch',
-          status: WorkoutStatus.upcoming,
-          icon: Icons.self_improvement,
-        ),
-      ];
+        ));
+      }
+
+      return workoutItems;
+    } catch (e) {
+      print('Error loading workouts: $e');
+      return [];
     }
-    return [];
   }
 
   @override
@@ -82,9 +121,26 @@ class _AssignedWorkoutsListScreenState extends State<AssignedWorkoutsListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final workouts = _getWorkoutsForDate(_selectedDate);
-    final todayWorkouts = workouts.where((w) => w.status == WorkoutStatus.dueToday || w.status == WorkoutStatus.completed).toList();
-    final tomorrowWorkouts = workouts.where((w) => w.status == WorkoutStatus.upcoming).toList();
+    return FutureBuilder<List<WorkoutItem>>(
+      future: _getWorkoutsForDate(_selectedDate),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: AppColors.backgroundDark,
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final workouts = snapshot.data ?? [];
+        final todayWorkouts = workouts.where((w) => w.status == WorkoutStatus.dueToday || w.status == WorkoutStatus.completed).toList();
+        final tomorrowWorkouts = workouts.where((w) => w.status == WorkoutStatus.upcoming).toList();
+
+        return _buildContent(todayWorkouts, tomorrowWorkouts);
+      },
+    );
+  }
+
+  Widget _buildContent(List<WorkoutItem> todayWorkouts, List<WorkoutItem> tomorrowWorkouts) {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
@@ -189,7 +245,7 @@ class _AssignedWorkoutsListScreenState extends State<AssignedWorkoutsListScreen>
             ),
             // Workout List
             Expanded(
-              child: workouts.isEmpty
+              child: (todayWorkouts.isEmpty && tomorrowWorkouts.isEmpty)
                   ? _buildEmptyState()
                   : ListView(
                       padding: const EdgeInsets.all(16.0),
@@ -284,7 +340,7 @@ class _AssignedWorkoutsListScreenState extends State<AssignedWorkoutsListScreen>
     );
   }
 
-  Widget _buildWorkoutCard(WorkoutData workout) {
+  Widget _buildWorkoutCard(WorkoutItem workout) {
     final isDue = workout.status == WorkoutStatus.dueToday;
     final isCompleted = workout.status == WorkoutStatus.completed;
     final isUpcoming = workout.status == WorkoutStatus.upcoming;
@@ -352,7 +408,11 @@ class _AssignedWorkoutsListScreenState extends State<AssignedWorkoutsListScreen>
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => WorkoutLoggingScreen(workoutName: workout.name),
+                    builder: (_) => WorkoutLoggingScreen(
+                      assignedWorkoutId: workout.assignedWorkoutId,
+                      templateId: workout.templateId,
+                      workoutName: workout.name,
+                    ),
                   ),
                 );
               },
@@ -449,12 +509,16 @@ enum WorkoutStatus {
   upcoming,
 }
 
-class WorkoutData {
+class WorkoutItem {
+  final String assignedWorkoutId;
+  final String templateId;
   final String name;
   final WorkoutStatus status;
   final IconData icon;
 
-  WorkoutData({
+  WorkoutItem({
+    required this.assignedWorkoutId,
+    required this.templateId,
     required this.name,
     required this.status,
     required this.icon,

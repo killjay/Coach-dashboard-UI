@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/primary_button.dart';
 import '../../../widgets/common/app_icon_button.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../services/workout_service.dart';
+import '../../../services/firestore_service.dart';
+import '../../../models/workout_template_model.dart';
+import '../../../models/workout_log_model.dart';
+import '../../../models/exercise_log_model.dart';
+import '../../../models/set_log_model.dart';
 
 class WorkoutLoggingScreen extends StatefulWidget {
+  final String? assignedWorkoutId;
+  final String? templateId;
   final String workoutName;
 
   const WorkoutLoggingScreen({
     super.key,
+    this.assignedWorkoutId,
+    this.templateId,
     this.workoutName = 'Upper Body Strength',
   });
 
@@ -18,39 +30,115 @@ class WorkoutLoggingScreen extends StatefulWidget {
 
 class _WorkoutLoggingScreenState extends State<WorkoutLoggingScreen> {
   int _activeExerciseIndex = 0;
+  final WorkoutService _workoutService = WorkoutService();
+  final FirestoreService _firestoreService = FirestoreService();
+  
+  List<ExerciseData> _exercises = [];
+  WorkoutTemplateModel? _template;
+  bool _isLoading = true;
 
-  final List<ExerciseData> _exercises = [
-    ExerciseData(
-      name: 'Barbell Bench Press',
-      prescription: '3 Sets / 8-10 Reps',
-      sets: [
-        SetData(setNumber: 1, previousWeight: 220, previousReps: 8, weight: 225, reps: 8, completed: true),
-        SetData(setNumber: 2, previousWeight: 220, previousReps: 8, weight: null, reps: null, completed: false),
-        SetData(setNumber: 3, previousWeight: 220, previousReps: 8, weight: null, reps: null, completed: false),
-      ],
-    ),
-    ExerciseData(
-      name: 'Pull Ups',
-      prescription: '3 Sets / 8-10 Reps',
-      sets: [
-        SetData(setNumber: 1, previousWeight: 0, previousReps: 10, weight: null, reps: null, completed: false),
-        SetData(setNumber: 2, previousWeight: 0, previousReps: 10, weight: null, reps: null, completed: false),
-        SetData(setNumber: 3, previousWeight: 0, previousReps: 10, weight: null, reps: null, completed: false),
-      ],
-    ),
-    ExerciseData(
-      name: 'Dumbbell Shoulder Press',
-      prescription: '3 Sets / 10-12 Reps',
-      sets: [
-        SetData(setNumber: 1, previousWeight: 50, previousReps: 12, weight: null, reps: null, completed: false),
-        SetData(setNumber: 2, previousWeight: 50, previousReps: 12, weight: null, reps: null, completed: false),
-        SetData(setNumber: 3, previousWeight: 50, previousReps: 12, weight: null, reps: null, completed: false),
-      ],
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadWorkoutTemplate();
+  }
+
+  Future<void> _loadWorkoutTemplate() async {
+    if (widget.templateId == null) {
+      // Use mock data if no template
+      setState(() {
+        _exercises = _getMockExercises();
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final result = await _workoutService.getTemplate(widget.templateId!);
+      if (result.isSuccess && result.dataOrNull != null) {
+        _template = result.dataOrNull;
+        
+        // Convert template exercises to ExerciseData
+        final exercises = _template!.exercises.map((exercise) {
+          final sets = List.generate(exercise.sets, (index) {
+            return SetData(
+              setNumber: index + 1,
+              previousWeight: exercise.weight?.toInt() ?? 0,
+              previousReps: _parseReps(exercise.reps) ?? 0,
+              weight: null,
+              reps: null,
+              completed: false,
+            );
+          });
+          
+          return ExerciseData(
+            name: exercise.name,
+            prescription: '${exercise.sets} Sets / ${exercise.reps}',
+            sets: sets,
+          );
+        }).toList();
+
+        setState(() {
+          _exercises = exercises;
+          _isLoading = false;
+        });
+      } else {
+        // Fallback to mock data
+        setState(() {
+          _exercises = _getMockExercises();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading template: $e');
+      setState(() {
+        _exercises = _getMockExercises();
+        _isLoading = false;
+      });
+    }
+  }
+
+  int? _parseReps(String reps) {
+    // Parse "8-10" or "10" to get a number
+    final parts = reps.split('-');
+    if (parts.isNotEmpty) {
+      return int.tryParse(parts[0].trim());
+    }
+    return null;
+  }
+
+  List<ExerciseData> _getMockExercises() {
+    return [
+      ExerciseData(
+        name: 'Barbell Bench Press',
+        prescription: '3 Sets / 8-10 Reps',
+        sets: [
+          SetData(setNumber: 1, previousWeight: 220, previousReps: 8, weight: 225, reps: 8, completed: true),
+          SetData(setNumber: 2, previousWeight: 220, previousReps: 8, weight: null, reps: null, completed: false),
+          SetData(setNumber: 3, previousWeight: 220, previousReps: 8, weight: null, reps: null, completed: false),
+        ],
+      ),
+      ExerciseData(
+        name: 'Pull Ups',
+        prescription: '3 Sets / 8-10 Reps',
+        sets: [
+          SetData(setNumber: 1, previousWeight: 0, previousReps: 10, weight: null, reps: null, completed: false),
+          SetData(setNumber: 2, previousWeight: 0, previousReps: 10, weight: null, reps: null, completed: false),
+          SetData(setNumber: 3, previousWeight: 0, previousReps: 10, weight: null, reps: null, completed: false),
+        ],
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF111111),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF111111), // background-dark
       body: SafeArea(
@@ -137,16 +225,7 @@ class _WorkoutLoggingScreenState extends State<WorkoutLoggingScreen> {
                 width: double.infinity,
                 child: PrimaryButton(
                   text: 'Mark Workout as Complete',
-                  onPressed: () {
-                    // Mark workout as complete
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Workout marked as complete!'),
-                        backgroundColor: Color(0xFF39E079),
-                      ),
-                    );
-                  },
+                  onPressed: _completeWorkout,
                 ),
               ),
             ),
@@ -532,6 +611,95 @@ class _WorkoutLoggingScreenState extends State<WorkoutLoggingScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _completeWorkout() async {
+    if (widget.assignedWorkoutId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot complete workout: Missing assignment ID'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final authProvider = context.read<AuthProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User not authenticated'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Convert ExerciseData to ExerciseLogModel
+      final exerciseLogs = _exercises.map((exercise) {
+        final setLogs = exercise.sets.map((set) {
+          return SetLogModel(
+            setNumber: set.setNumber,
+            weight: set.weight?.toDouble(),
+            reps: set.reps,
+            completed: set.completed,
+          );
+        }).toList();
+
+        return ExerciseLogModel(
+          exerciseName: exercise.name,
+          sets: setLogs,
+          completed: setLogs.every((s) => s.completed),
+        );
+      }).toList();
+
+      // Create WorkoutLogModel
+      final workoutLog = WorkoutLogModel(
+        id: _firestoreService.generateId('workout_logs'),
+        assignedWorkoutId: widget.assignedWorkoutId!,
+        clientId: clientId,
+        date: DateTime.now(),
+        exercises: exerciseLogs,
+        completed: true,
+        loggedAt: DateTime.now(),
+      );
+
+      // Save to Firestore
+      final result = await _workoutService.logWorkout(workoutLog);
+      
+      if (result.isSuccess) {
+        if (mounted) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Workout marked as complete!'),
+              backgroundColor: Color(0xFF39E079),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${result.errorMessage}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error completing workout: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 

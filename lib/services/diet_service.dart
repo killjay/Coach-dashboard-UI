@@ -173,5 +173,86 @@ class DietService {
       return Failure('Failed to get diet history: $e');
     }
   }
+
+  /// Stream food logs (real-time)
+  Stream<List<FoodLogModel>> streamFoodLogs(String clientId) {
+    return _firestoreService.streamQuery(
+      'food_logs',
+      whereField: 'clientId',
+      whereValue: clientId,
+      orderBy: 'date',
+      descending: true,
+    ).map((dataList) {
+      return dataList.map((data) => FoodLogModel.fromJson(data)).toList();
+    });
+  }
+
+  /// Get or create daily food log
+  Future<Result<FoodLogModel>> getOrCreateDailyFoodLog(String clientId, DateTime date) async {
+    try {
+      final logResult = await getDailyMacros(clientId, date);
+      final existingLog = logResult.dataOrNull;
+      
+      if (existingLog != null) {
+        return Success(existingLog);
+      }
+      
+      // Create new log
+      final newLog = FoodLogModel(
+        id: _firestoreService.generateId('food_logs'),
+        clientId: clientId,
+        date: date,
+        meals: [],
+        totalCalories: 0.0,
+        totalProtein: 0.0,
+        totalCarbs: 0.0,
+        totalFat: 0.0,
+        loggedAt: DateTime.now(),
+      );
+      
+      return Success(newLog);
+    } catch (e) {
+      return Failure('Failed to get or create food log: $e');
+    }
+  }
+
+  /// Add meal to existing log
+  Future<Result<FoodLogModel>> addMealToLog(String clientId, DateTime date, MealModel meal) async {
+    try {
+      final logResult = await getOrCreateDailyFoodLog(clientId, date);
+      final foodLog = logResult.dataOrNull;
+      
+      if (foodLog == null) {
+        return const Failure('Failed to get or create food log');
+      }
+      
+      // Add meal to list
+      final updatedMeals = [...foodLog.meals, meal];
+      
+      // Recalculate totals
+      final totalCalories = updatedMeals.fold<double>(0.0, (sum, m) => sum + m.calories);
+      final totalProtein = updatedMeals.fold<double>(0.0, (sum, m) => sum + m.protein);
+      final totalCarbs = updatedMeals.fold<double>(0.0, (sum, m) => sum + m.carbs);
+      final totalFat = updatedMeals.fold<double>(0.0, (sum, m) => sum + m.fat);
+      
+      // Create updated log
+      final updatedLog = FoodLogModel(
+        id: foodLog.id,
+        clientId: foodLog.clientId,
+        date: foodLog.date,
+        meals: updatedMeals,
+        totalCalories: totalCalories,
+        totalProtein: totalProtein,
+        totalCarbs: totalCarbs,
+        totalFat: totalFat,
+        loggedAt: DateTime.now(),
+      );
+      
+      // Save to Firestore
+      return await logFood(updatedLog);
+    } catch (e) {
+      return Failure('Failed to add meal to log: $e');
+    }
+  }
 }
 

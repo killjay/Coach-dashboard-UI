@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
 import '../../../widgets/common/primary_button.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../services/diet_service.dart';
+import '../../../services/firestore_service.dart';
+import '../../../models/food_log_model.dart';
 import 'daily_macro_goals_screen.dart';
 
 class ManualFoodLoggingScreen extends StatefulWidget {
@@ -22,6 +27,9 @@ class _ManualFoodLoggingScreenState extends State<ManualFoodLoggingScreen> {
   final _carbsController = TextEditingController();
   final _fatController = TextEditingController();
 
+  final DietService _dietService = DietService();
+  bool _isLoading = false;
+
   String _selectedMeal = 'Breakfast';
   String _selectedUnit = 'g';
 
@@ -39,16 +47,76 @@ class _ManualFoodLoggingScreenState extends State<ManualFoodLoggingScreen> {
     super.dispose();
   }
 
-  void _handleLogFood() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Save food log to Firestore via DietProvider
+  Future<void> _handleLogFood() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final authProvider = context.read<AuthProvider>();
+    final clientId = authProvider.user?.uid;
+    
+    if (clientId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Food logged successfully!'),
-          backgroundColor: AppColors.primary,
+          content: Text('User not authenticated'),
+          backgroundColor: Colors.red,
         ),
       );
-      Navigator.of(context).pop();
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final calories = double.tryParse(_caloriesController.text) ?? 0.0;
+      final protein = double.tryParse(_proteinController.text) ?? 0.0;
+      final carbs = double.tryParse(_carbsController.text) ?? 0.0;
+      final fat = double.tryParse(_fatController.text) ?? 0.0;
+
+      final meal = MealModel(
+        name: '${_selectedMeal}: ${_foodNameController.text}',
+        calories: calories,
+        protein: protein,
+        carbs: carbs,
+        fat: fat,
+      );
+
+      final today = DateTime.now();
+      final startOfDay = DateTime(today.year, today.month, today.day);
+
+      final result = await _dietService.addMealToLog(clientId, startOfDay, meal);
+      
+      if (result.isSuccess) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Food logged successfully!'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+          Navigator.of(context).pop();
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${result.errorMessage}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error logging food: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -265,8 +333,8 @@ class _ManualFoodLoggingScreenState extends State<ManualFoodLoggingScreen> {
               const SizedBox(height: 32),
               // Log Food Item Button
               PrimaryButton(
-                text: 'Log Food Item',
-                onPressed: _handleLogFood,
+                text: _isLoading ? 'Logging...' : 'Log Food Item',
+                onPressed: _isLoading ? null : _handleLogFood,
                 height: 56,
               ),
               const SizedBox(height: 24),

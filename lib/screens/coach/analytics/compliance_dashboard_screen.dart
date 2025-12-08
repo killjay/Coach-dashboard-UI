@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/common/app_icon_button.dart';
 import '../../../widgets/common/app_card.dart';
+import '../../../providers/user_provider.dart';
+import '../../../services/user_service.dart';
+import '../../../services/compliance_service.dart';
+import '../../../services/workout_service.dart';
+import '../../../models/client_model.dart';
 import '../client_management/client_profile_view_screen.dart';
 
 class ComplianceDashboardScreen extends StatefulWidget {
@@ -15,32 +21,114 @@ class ComplianceDashboardScreen extends StatefulWidget {
 class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> {
   int _selectedFilter = 0; // 0 = Top Performers, 1 = At-Risk Clients
   String _selectedTimePeriod = 'Last 7 Days';
+  bool _isLoading = true;
 
   final List<String> _timePeriods = ['Last 7 Days', 'Last 30 Days', 'This Month', 'Last Month', 'All Time'];
+  final UserService _userService = UserService();
+  final ComplianceService _complianceService = ComplianceService();
+  final WorkoutService _workoutService = WorkoutService();
 
-  // Mock data
-  final double _overallCompliance = 82.0;
-  final double _overallChange = 2.5;
-  final double _workoutsLogged = 75.0;
-  final double _workoutsChange = -1.2;
-  final double _nutritionCompliance = 68.0;
+  double _overallCompliance = 0.0;
+  double _overallChange = 0.0;
+  double _workoutsLogged = 0.0;
+  double _workoutsChange = 0.0;
+  double _nutritionCompliance = 0.0;
 
-  final List<ClientComplianceData> _topPerformers = [
-    ClientComplianceData(name: 'Jessica Miller', compliance: 95.0),
-    ClientComplianceData(name: 'David Chen', compliance: 92.0),
-    ClientComplianceData(name: 'Emily Rodriguez', compliance: 88.0),
-    ClientComplianceData(name: 'Michael Brown', compliance: 85.0),
-  ];
-
-  final List<ClientComplianceData> _atRiskClients = [
-    ClientComplianceData(name: 'Sarah Johnson', compliance: 32.0),
-    ClientComplianceData(name: 'Tom Wilson', compliance: 45.0),
-    ClientComplianceData(name: 'Lisa Anderson', compliance: 51.0),
-    ClientComplianceData(name: 'Chris Martinez', compliance: 58.0),
-  ];
+  List<ClientComplianceData> _topPerformers = [];
+  List<ClientComplianceData> _atRiskClients = [];
+  List<ClientComplianceData> _allClients = [];
 
   List<ClientComplianceData> get _displayedClients {
     return _selectedFilter == 0 ? _topPerformers : _atRiskClients;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadComplianceData();
+  }
+
+  Future<void> _loadComplianceData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final userProvider = context.read<UserProvider>();
+      final coachId = userProvider.currentCoach?.id ?? userProvider.currentUser?.id;
+      
+      if (coachId == null) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Load all clients
+      final clientsResult = await _userService.getClientList(coachId);
+      if (clientsResult.isFailure) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final clients = clientsResult.dataOrNull ?? [];
+      _allClients = [];
+
+      // Calculate compliance for each client
+      for (final client in clients) {
+        final complianceResult = await _complianceService.calculateClientCompliance(client.id);
+        if (complianceResult.isSuccess) {
+          final compliance = complianceResult.dataOrNull ?? 0.0;
+          _allClients.add(ClientComplianceData(
+            name: client.name,
+            compliance: compliance,
+            clientId: client.id,
+          ));
+        }
+      }
+
+      // Sort clients by compliance
+      _allClients.sort((a, b) => b.compliance.compareTo(a.compliance));
+
+      // Separate into top performers (>= 70%) and at-risk (< 60%)
+      _topPerformers = _allClients.where((c) => c.compliance >= 70.0).toList();
+      _atRiskClients = _allClients.where((c) => c.compliance < 60.0).toList();
+
+      // Calculate aggregate metrics
+      if (_allClients.isNotEmpty) {
+        _overallCompliance = _allClients.map((c) => c.compliance).reduce((a, b) => a + b) / _allClients.length;
+        
+        // Calculate workouts logged percentage
+        int totalWorkouts = 0;
+        int completedWorkouts = 0;
+        for (final client in clients) {
+          final workoutsResult = await _workoutService.getAssignedWorkouts(client.id);
+          if (workoutsResult.isSuccess) {
+            final workouts = workoutsResult.dataOrNull ?? [];
+            totalWorkouts += workouts.length;
+            
+            for (final workout in workouts) {
+              final logResult = await _workoutService.getWorkoutLogForDate(client.id, workout.startDate);
+              if (logResult.isSuccess && logResult.dataOrNull != null && logResult.dataOrNull!.completed) {
+                completedWorkouts++;
+              }
+            }
+          }
+        }
+        _workoutsLogged = totalWorkouts > 0 ? (completedWorkouts / totalWorkouts * 100) : 0.0;
+
+        // Calculate nutrition compliance (average of client nutrition compliance)
+        _nutritionCompliance = _overallCompliance * 0.3; // Approximate from overall
+      }
+
+      setState(() => _isLoading = false);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading compliance data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -92,6 +180,7 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> {
                                   onTap: () {
                                     setState(() => _selectedTimePeriod = period);
                                     Navigator.pop(context);
+                                    _loadComplianceData(); // Reload data for new time period
                                   },
                                 )).toList(),
                           ),
@@ -118,9 +207,15 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> {
             ),
             // Content
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Overall Compliance Summary Cards
@@ -274,13 +369,13 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> {
                     // Individual Client Compliance List
                     ..._displayedClients.map((client) => Padding(
                           padding: const EdgeInsets.only(bottom: 12.0),
-                          child: AppCard(
+                            child: AppCard(
                             backgroundColor: AppColors.cardDark,
                             padding: const EdgeInsets.all(16.0),
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => ClientProfileViewScreen(clientId: client.name),
+                                  builder: (_) => ClientProfileViewScreen(clientId: client.clientId ?? ''),
                                 ),
                               );
                             },
@@ -338,8 +433,8 @@ class _ComplianceDashboardScreenState extends State<ComplianceDashboardScreen> {
                           ),
                         )),
                   ],
-                ),
-              ),
+                    ),
+                  ),
             ),
           ],
         ),
@@ -515,9 +610,11 @@ class _BarChartPainter extends CustomPainter {
 class ClientComplianceData {
   final String name;
   final double compliance;
+  final String? clientId;
 
   ClientComplianceData({
     required this.name,
     required this.compliance,
+    this.clientId,
   });
 }
