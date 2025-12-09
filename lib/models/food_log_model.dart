@@ -25,7 +25,7 @@ class MealModel {
   Map<String, dynamic> toJson() => _$MealModelToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class FoodLogModel {
   final String id;
   final String clientId;

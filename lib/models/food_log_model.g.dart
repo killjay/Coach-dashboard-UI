@@ -43,7 +43,7 @@ Map<String, dynamic> _$FoodLogModelToJson(FoodLogModel instance) =>
       'id': instance.id,
       'clientId': instance.clientId,
       'date': FoodLogModel._timestampToJson(instance.date),
-      'meals': instance.meals,
+      'meals': instance.meals.map((e) => e.toJson()).toList(),
       'totalCalories': instance.totalCalories,
       'totalProtein': instance.totalProtein,
       'totalCarbs': instance.totalCarbs,
