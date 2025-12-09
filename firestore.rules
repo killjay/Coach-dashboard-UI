@@ -21,21 +21,24 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && getUserId() == coachId;
     }
     
+    // Helper function to check if user is a coach
+    function isCoach() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/coaches/$(getUserId()));
+    }
+    
     // Clients collection - clients can read/write their own data, coaches can read their clients' data
     match /clients/{clientId} {
       // Allow clients to read/write their own data
       allow read, write: if isAuthenticated() && getUserId() == clientId;
       
       // Allow coaches to read clients where coachId matches
-      // For queries, resource might be null, so we check if coach document exists
-      // and verify the client's coachId matches (if resource exists)
-      allow read: if isAuthenticated() && 
-        exists(/databases/$(database)/documents/coaches/$(getUserId())) &&
-        (resource == null || resource.data.coachId == getUserId());
+      // For queries, Firestore evaluates this rule for each document in the result
+      // We check if user is a coach and if the document's coachId matches
+      allow read: if isCoach() && resource.data.coachId == getUserId();
       
       // Allow coaches to create client documents (for initial setup)
-      allow create: if isAuthenticated() && 
-        exists(/databases/$(database)/documents/coaches/$(getUserId()));
+      allow create: if isCoach();
     }
     
     // Workout templates - coaches can read/write their own templates

@@ -58,7 +58,7 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
     super.dispose();
   }
 
-  void _subscribeToClients() {
+  Future<void> _subscribeToClients() async {
     final authProvider = context.read<AuthProvider>();
     final coachId = authProvider.user?.uid;
 
@@ -66,6 +66,38 @@ class _ClientListViewScreenState extends State<ClientListViewScreen> {
       setState(() {
         _isLoading = false;
       });
+      return;
+    }
+
+    // Verify coach document exists before querying
+    try {
+      final coachResult = await _userService.getCoach(coachId);
+      if (coachResult.isFailure || coachResult.dataOrNull == null) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Coach profile not found. Please complete your profile setup.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error verifying coach profile: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       return;
     }
 
