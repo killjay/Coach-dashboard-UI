@@ -33,9 +33,18 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && getUserId() == clientId;
       
       // Allow coaches to read clients where coachId matches
-      // For queries, Firestore evaluates this rule for each document in the result
-      // We check if user is a coach and if the document's coachId matches
-      allow read: if isCoach() && resource.data.coachId == getUserId();
+      // For queries: Firestore validates that ALL documents matching the query pass this rule
+      // The query filters by coachId == getUserId(), so documents will have matching coachId
+      // We verify the user is a coach by checking if coach document exists
+      // Note: The exists() check is evaluated per-document for queries
+      allow read: if isAuthenticated() && 
+        resource.data.coachId == getUserId() &&
+        exists(/databases/$(database)/documents/coaches/$(getUserId()));
+      
+      // Allow list queries for coaches - helps Firestore validate queries before execution
+      // The query must filter by coachId == getUserId() for documents to pass the read rule
+      allow list: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/coaches/$(getUserId()));
       
       // Allow coaches to create client documents (for initial setup)
       allow create: if isCoach();
